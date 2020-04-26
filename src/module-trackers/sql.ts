@@ -29,6 +29,7 @@ export const wrapSqlQuery = function wrapSqlQuery(queryString, params, callback,
 
     event = resourceAccessStart(serviceName, host, {
       database,
+      driver,
       request: {
         query: queryString.substring(0, MAX_QUERY_SIZE),
         parameters: isArray(params) ? params.slice(0, MAX_PARAMS_LENGTH) : undefined
@@ -37,30 +38,26 @@ export const wrapSqlQuery = function wrapSqlQuery(queryString, params, callback,
 
     event.request.operation = 'query'
 
-    const responsePromise = new Promise(resolve => {
-      patchedCallback = (err, res, fields) => {
-        const endTime = Date.now()
-        let rowCount: number | undefined = undefined
+    patchedCallback = (err, res, fields) => {
+      const endTime = Date.now()
+      let rowCount: number | undefined
 
-        if (!err) {
-          rowCount = res.rowCount
-          if (!rowCount && isArray(res)) {
-            rowCount = res.length
-          }
-        }
-
-        event.end = endTime
-        event.status = err ? 'ERROR' : 'OK'
-        event.response.rowCount = rowCount
-        event.error = JSON.stringify(serializeError(err))
-
-        resolve()
-
-        if (callback) {
-          callback(err, res, fields)
+      if (!err) {
+        rowCount = res.rowCount
+        if (!rowCount && isArray(res)) {
+          rowCount = res.length
         }
       }
-    })
+
+      event.end = endTime
+      event.status = err ? 'ERROR' : 'OK'
+      event.response.rowCount = rowCount
+      event.error = JSON.stringify(serializeError(err))
+
+      if (callback) {
+        callback(err, res, fields)
+      }
+    }
   } catch (e) {
     if (event) {
       event.end = Date.now()

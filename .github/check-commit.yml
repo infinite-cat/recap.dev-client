@@ -1,0 +1,17 @@
+name: check-commit
+
+on: push
+
+jobs:
+  check-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+      - name: install dependencies
+        run: yarn --production=false
+      - name: lint
+        run: yarn lint
+      - name: tsc
+        run: yarn tsc

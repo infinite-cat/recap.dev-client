@@ -1,9 +1,10 @@
+/* eslint-disable camelcase,no-undef,import/no-extraneous-dependencies,global-require */
 import shimmer from 'shimmer'
 
 let lastError: null | Error = null
 
 export const tryRequire: any = (id: string) => {
-  // Typeorm + webpack fix
+  // hack for webpack
   try {
     if (id === 'pg') {
       // @ts-ignore
@@ -18,6 +19,11 @@ export const tryRequire: any = (id: string) => {
     if (id === 'mysql/lib/Connection.js') {
       // @ts-ignore
       return require('mysql/lib/Connection.js')
+    }
+
+    if (id === '@elastic/elasticsearch') {
+      // @ts-ignore
+      return require('@elastic/elasticsearch')
     }
   } catch (e) {
     lastError = e
@@ -42,7 +48,7 @@ tryRequire.lastError = () => lastError
 export const getModules = function getModules(id: string) {
   const modules: any[] = []
   if (typeof require.resolve.paths !== 'function') {
-    let module = tryRequire(id)
+    const module = tryRequire(id)
 
     if (module) {
       modules.push(module)
@@ -70,6 +76,8 @@ export const patchModule = function patchModule(
 ) {
   const modules = getModules(id)
   modules.forEach((module: any) => {
-    shimmer.wrap(memberExtractor(module), methodName, wrapper)
+    if (!memberExtractor(module).tracemanWrapped) {
+      shimmer.wrap(memberExtractor(module), methodName, wrapper)
+    }
   })
 }

@@ -8,10 +8,10 @@ import { trackModules } from './module-trackers'
 
 trackModules()
 
-let trace: any = undefined
+let trace: any
 
 const emptyTrace: any = {
-  appName: process.env.CODETRAIL_APP_NAME,
+  appName: process.env.TRACEMAN_APP_NAME,
   functionCallEvents: [],
   resourceAccessEvents: [],
   status: 'OK'
@@ -26,7 +26,9 @@ export const functionStart = (fileName: string, functionName: string) => {
     functionName
   }
 
-  trace.functionCallEvents.push(event)
+  if (trace) {
+    trace.functionCallEvents.push(event)
+  }
 
   return event
 }
@@ -87,8 +89,8 @@ export const functionEnd = (event: any) => {
   event.end = timestamp
 }
 
-const syncTimeout = process.env.CODETRAIL_SYNC_TIMEOUT
-  ? Number(process.env.CODETRAIL_SYNC_TIMEOUT)
+const syncTimeout = process.env.TRACEMAN_SYNC_TIMEOUT
+  ? Number(process.env.TRACEMAN_SYNC_TIMEOUT)
   : 1000
 
 export const sync = async () => {
@@ -98,7 +100,7 @@ export const sync = async () => {
     const dataBuffer = gzipSync(Buffer.from(JSON.stringify(trace), 'utf-8'))
     console.log('sending bytes: ', Buffer.byteLength(dataBuffer))
 
-    await fetch(process.env.CODETRAIL_SYNC_ENDPOINT!, {
+    await fetch(process.env.TRACEMAN_SYNC_ENDPOINT!, {
       method: 'POST',
       body: dataBuffer,
       headers: {
@@ -165,7 +167,7 @@ export const wrapLambdaHandler = (func: any) => {
     trace = cloneDeep(emptyTrace)
     const event: any = functionStart('', context.functionName)
     console.log('starting event ', JSON.stringify(event))
-    setLambdaRequest(Object.assign({}, request))
+    setLambdaRequest({ ...request })
 
     setLambdaContext(context)
 

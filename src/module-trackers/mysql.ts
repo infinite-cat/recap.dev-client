@@ -2,7 +2,7 @@ import { patchModule } from './utils'
 import { parseQueryArgs, wrapSqlQuery } from './sql'
 
 function mysqlQueryWrapper(wrappedFunction) {
-  let internalMySqlQueryWrapper = function internalMySqlQueryWrapper(sql, arg1, arg2) {
+  const internalMySqlQueryWrapper = function internalMySqlQueryWrapper(sql, arg1, arg2) {
     let queryString
     let callback
     let params
@@ -20,6 +20,7 @@ function mysqlQueryWrapper(wrappedFunction) {
       ;({ params, callback } = parseQueryArgs(arg1, arg2))
     }
 
+    // eslint-disable-next-line no-underscore-dangle
     if (callback === undefined && sql._callback) {
       // eslint-disable-line no-underscore-dangle
       // In pool connection, no callback passed, but _callback is being used.
@@ -34,13 +35,14 @@ function mysqlQueryWrapper(wrappedFunction) {
       callback = patchedCallback
     }
     if (overrideInnerCallback) {
+      // eslint-disable-next-line no-underscore-dangle
       sql._callback = patchedCallback
     }
     return wrappedFunction.apply(this, [sql, params, callback])
   }
 
   // @ts-ignore
-  internalMySqlQueryWrapper.autotracerWrapped = true
+  internalMySqlQueryWrapper.tracemanWrapped = true
 
   return internalMySqlQueryWrapper
 }

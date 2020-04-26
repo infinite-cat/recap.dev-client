@@ -1,6 +1,6 @@
 {
-  "name": "@codetrail/client",
-  "version": "0.0.1",
+  "name": "@traceman/client",
+  "version": "1.0.3",
   "description": "",
   "keywords": [],
   "main": "dist/client.umd.js",
@@ -12,7 +12,7 @@
   "author": "Arseny Yankovsky",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/ArsenyYankovsky/traceman-client.git"
   },
   "license": "MIT",
   "engines": {
@@ -24,6 +24,7 @@
     "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
     "start": "rollup -c rollup.config.ts -w",
     "test": "jest --coverage",
+    "tsc": "tsc --noEmit",
     "test:watch": "jest --coverage --watch",
     "test:prod": "npm run lint && npm run test -- --no-cache",
     "deploy-docs": "ts-node tools/gh-pages-publish",
@@ -122,7 +123,7 @@
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.27.0",
-    "semantic-release": "^15.9.16",
+    "semantic-release": "^17.0.7",
     "shelljs": "^0.8.3",
     "travis-deploy-once": "^5.0.9",
     "ts-jest": "^23.10.2",
@@ -136,5 +137,8 @@
     "node-fetch": "^2.6.0",
     "serialize-error": "^6.0.0",
     "shimmer": "^1.2.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

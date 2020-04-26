@@ -202,9 +202,7 @@ const lambdaEventCreator = {
     event.request.payload = parameters.Payload
   },
 
-  responseHandler(response, event) {
-    // eslint-disable-line no-unused-vars
-  }
+  responseHandler() {}
 }
 
 const dynamoDBEventCreator = {
@@ -436,50 +434,48 @@ function AWSSDKWrapper(wrappedFunction) {
         specificEventCreators[serviceIdentifier].patchInput(this, event)
       }
 
-      const responsePromise = new Promise(resolve => {
-        request
-          .on('send', () => {
-            try {
-              specificEventCreators[serviceIdentifier].requestHandler(request, event)
-            } catch (e) {
-              logTracerError(e)
-            }
-          })
-          .on('error', error => {
-            try {
-              event.error = JSON.stringify(serializeError(error))
-              event.status = 'ERROR'
-            } catch (e) {
-              logTracerError(e)
-            }
-          })
-          .on('complete', response => {
-            try {
-              event.end = Date.now()
+      request
+        .on('send', () => {
+          try {
+            specificEventCreators[serviceIdentifier].requestHandler(request, event)
+          } catch (e) {
+            logTracerError(e)
+          }
+        })
+        .on('error', error => {
+          try {
+            event.end = Date.now()
+            event.error = JSON.stringify(serializeError(error))
+            event.status = 'ERROR'
+          } catch (e) {
+            logTracerError(e)
+          }
+        })
+        .on('complete', response => {
+          try {
+            event.end = Date.now()
+            event.status = 'OK'
+            event.request.requestId = response.requestId
+
+            if (response.data) {
+              event.response.statusCode = response.httpResponse.statusCode
               event.status = 'OK'
-              event.request.requestId = response.requestId
 
-              if (response.data) {
-                event.response.statusCode = response.httpResponse.statusCode
-                event.status = 'OK'
-
-                specificEventCreators[serviceIdentifier].responseHandler(response, event)
-              }
-
-              if (response.error !== null) {
-                event.error = JSON.stringify(response.error)
-                event.status = 'ERROR'
-              }
-            } catch (e) {
-              logTracerError(e)
-            } finally {
-              resolve()
+              specificEventCreators[serviceIdentifier].responseHandler(response, event)
             }
-          })
-      })
+
+            if (response.error !== null) {
+              event.error = JSON.stringify(response.error)
+              event.status = 'ERROR'
+            }
+          } catch (e) {
+            logTracerError(e)
+          }
+        })
     } catch (error) {
       logTracerError(error)
     }
+
     return wrappedFunction.apply(this, [callback])
   }
 }

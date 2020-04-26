@@ -1,8 +1,8 @@
 import { parseQueryArgs, wrapSqlQuery } from './sql'
 import { patchModule } from './utils'
 
-const pgPath = process.env.CODETRAIL_POSTGRES_MODULE
-  ? `${process.cwd()}${process.env.CODETRAIL_POSTGRES_MODULE}`
+const pgPath = process.env.TRACEMAN_POSTGRES_MODULE
+  ? `${process.cwd()}${process.env.TRACEMAN_POSTGRES_MODULE}`
   : 'pg'
 
 function pgClientWrapper(wrappedFunction) {
