@@ -30,7 +30,7 @@ function pgClientWrapper(wrappedFunction) {
       sqlParams,
       callback,
       this.connectionParameters || this._clients[0], // eslint-disable-line
-      'pg'
+      'pg',
     )
 
     if (callback) {
@@ -45,20 +45,20 @@ function pgClientWrapper(wrappedFunction) {
     }
 
     return responsePromise.then(
-      res => {
+      (res) => {
         patchedCallback(null, res, null)
         return res
       },
-      err => {
+      (err) => {
         patchedCallback(err, null, null)
         throw err
-      }
+      },
     )
   }
 }
 
 export const trackPostgres = () => {
-  patchModule(pgPath, 'query', pgClientWrapper, pg => pg.Client.prototype)
+  patchModule(pgPath, 'query', pgClientWrapper, (pg) => pg.Client.prototype)
 
-  patchModule('pg-pool', 'query', pgClientWrapper, Pool => Pool.prototype)
+  patchModule('pg-pool', 'query', pgClientWrapper, (Pool) => Pool.prototype)
 }

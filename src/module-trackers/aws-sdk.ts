@@ -10,7 +10,7 @@ const s3EventCreator = {
     const { operation } = request
 
     event.resourceIdentifier = {
-      bucketName: parameters.Bucket
+      bucketName: parameters.Bucket,
     }
 
     switch (operation) {
@@ -21,11 +21,11 @@ const s3EventCreator = {
       case 'putObject':
         event.request = {
           key: parameters.Key,
-          bucketName: parameters.Bucket
+          bucketName: parameters.Bucket,
         }
         event.resourceIdentifier = {
           bucketName: parameters.Bucket,
-          key: parameters.Key
+          key: parameters.Key,
         }
         break
       default:
@@ -39,7 +39,7 @@ const s3EventCreator = {
         event.response.files = response.data.Contents.map((entry: any) => ({
           key: `${entry.Key}`,
           size: entry.Size,
-          etag: entry.Etag
+          etag: entry.Etag,
         }))
         break
 
@@ -57,7 +57,7 @@ const s3EventCreator = {
       default:
         break
     }
-  }
+  },
 }
 
 const kinesisEventCreator = {
@@ -70,7 +70,7 @@ const kinesisEventCreator = {
     const parameters = request.params || {}
     event.resourceIdentifier = {
       streamName: parameters.StreamName,
-      paritionKey: parameters.PartitionKey
+      paritionKey: parameters.PartitionKey,
     }
     event.request.data = parameters.Data
   },
@@ -89,7 +89,7 @@ const kinesisEventCreator = {
       default:
         break
     }
-  }
+  },
 }
 
 const SNSEventCreator = {
@@ -97,7 +97,7 @@ const SNSEventCreator = {
     const parameters = request.params || {}
     const resourceArn = parameters.TopicArn || parameters.TargetArn
     event.resourceIdentifier = {
-      resourceArn
+      resourceArn,
     }
     event.request.message = parameters.Message
   },
@@ -110,7 +110,7 @@ const SNSEventCreator = {
       default:
         break
     }
-  }
+  },
 }
 
 const SQSEventCreator = {
@@ -127,7 +127,7 @@ const SQSEventCreator = {
     }
 
     event.resourceIdentifier = {
-      queueName
+      queueName,
     }
 
     const entry = 'Entries' in parameters ? parameters.Entries : parameters
@@ -150,7 +150,7 @@ const SQSEventCreator = {
         let messagesNumber = 0
         if ('Messages' in response.data && response.data.Messages.length > 0) {
           messagesNumber = response.data.Messages.length
-          const messageIds = response.data.Messages.map(x => x.MessageId)
+          const messageIds = response.data.Messages.map((x) => x.MessageId)
           event.response.messageIds = messageIds
           event.response.snsTrigger = getSNSTrigger(response.data.Messages)
           event.response.messagesNumber = messagesNumber
@@ -160,7 +160,7 @@ const SQSEventCreator = {
       default:
         break
     }
-  }
+  },
 }
 
 const SESEventCreator = {
@@ -187,7 +187,7 @@ const SESEventCreator = {
       default:
         break
     }
-  }
+  },
 }
 
 const lambdaEventCreator = {
@@ -202,7 +202,7 @@ const lambdaEventCreator = {
     event.request.payload = parameters.Payload
   },
 
-  responseHandler() {}
+  responseHandler() {},
 }
 
 const dynamoDBEventCreator = {
@@ -211,7 +211,7 @@ const dynamoDBEventCreator = {
     const { operation } = request
 
     event.resourceIdentifier = {
-      tableName: parameters.TableName
+      tableName: parameters.TableName,
     }
 
     switch (operation) {
@@ -255,12 +255,12 @@ const dynamoDBEventCreator = {
       case 'batchWriteItem': {
         const tableNames = Object.keys(parameters.RequestItems)
         event.resourceIdentifier = {
-          tableNames
+          tableNames,
         }
         const addedItems: any[] = []
         const deletedKeys: any[] = []
         for (const tableName of tableNames) {
-          parameters.RequestItems[tableName].forEach(item => {
+          parameters.RequestItems[tableName].forEach((item) => {
             if (item.PutRequest) {
               addedItems.push(item.PutRequest.Item)
             }
@@ -303,7 +303,7 @@ const dynamoDBEventCreator = {
       default:
         break
     }
-  }
+  },
 }
 
 const athenaEventCreator = {
@@ -312,11 +312,11 @@ const athenaEventCreator = {
     switch (request.operation) {
       case 'startQueryExecution':
         if (
-          'QueryExecutionContext' in parameters &&
-          'Database' in parameters.QueryExecutionContext
+          'QueryExecutionContext' in parameters
+          && 'Database' in parameters.QueryExecutionContext
         ) {
           event.resourceIdentifier = {
-            database: parameters.QueryExecutionContext.Database
+            database: parameters.QueryExecutionContext.Database,
           }
         }
 
@@ -336,17 +336,16 @@ const athenaEventCreator = {
     switch (response.request.operation) {
       case 'getQueryExecution':
         if (
-          'Status' in response.data.QueryExecution &&
-          'State' in response.data.QueryExecution.Status
+          'Status' in response.data.QueryExecution
+          && 'State' in response.data.QueryExecution.Status
         ) {
           event.response.state = response.data.QueryExecution.Status.State
         }
         if (
-          'ResultConfiguration' in response.data.QueryExecution &&
-          'OutputLocation' in response.data.QueryExecution.Status
+          'ResultConfiguration' in response.data.QueryExecution
+          && 'OutputLocation' in response.data.QueryExecution.Status
         ) {
-          event.response.resultLocation =
-            response.data.QueryExecution.ResultConfiguration.OutputLocation
+          event.response.resultLocation = response.data.QueryExecution.ResultConfiguration.OutputLocation
         }
         event.response.queryId = response.data.QueryExecutionId
         event.response.query = response.data.Query
@@ -360,7 +359,7 @@ const athenaEventCreator = {
       default:
         break
     }
-  }
+  },
 }
 
 const batchEventCreator = {
@@ -371,7 +370,7 @@ const batchEventCreator = {
     switch (operation) {
       case 'submitJob': {
         event.resourceIdentifier = {
-          jobName: parameters.jobName
+          jobName: parameters.jobName,
         }
 
         event.request.jobDefinition = parameters.jobDefinition
@@ -393,7 +392,7 @@ const batchEventCreator = {
       default:
         break
     }
-  }
+  },
 }
 
 const specificEventCreators = {
@@ -405,7 +404,7 @@ const specificEventCreators = {
   lambda: lambdaEventCreator,
   dynamodb: dynamoDBEventCreator,
   athena: athenaEventCreator,
-  batch: batchEventCreator
+  batch: batchEventCreator,
 }
 
 /**
@@ -426,8 +425,8 @@ function AWSSDKWrapper(wrappedFunction) {
 
       const event: any = resourceAccessStart(serviceIdentifier, undefined, {
         request: {
-          operation: request.operation
-        }
+          operation: request.operation,
+        },
       })
 
       if ('patchInput' in specificEventCreators[serviceIdentifier]) {
@@ -442,7 +441,7 @@ function AWSSDKWrapper(wrappedFunction) {
             logTracerError(e)
           }
         })
-        .on('error', error => {
+        .on('error', (error) => {
           try {
             event.end = Date.now()
             event.error = JSON.stringify(serializeError(error))
@@ -451,7 +450,7 @@ function AWSSDKWrapper(wrappedFunction) {
             logTracerError(e)
           }
         })
-        .on('complete', response => {
+        .on('complete', (response) => {
           try {
             event.end = Date.now()
             event.status = 'OK'
@@ -486,7 +485,7 @@ function wrapPromiseOnAdd(wrappedFunction) {
     try {
       // it is OK to just re-wrap, as the original function overrides
       // `promise` anyway
-      patchModule('aws-sdk', 'promise', AWSSDKWrapper, AWSmod => AWSmod.Request.prototype)
+      patchModule('aws-sdk', 'promise', AWSSDKWrapper, (AWSmod) => AWSmod.Request.prototype)
     } catch (err) {
       logTracerError(err)
     }
@@ -496,8 +495,8 @@ function wrapPromiseOnAdd(wrappedFunction) {
 
 export default {
   init() {
-    patchModule('aws-sdk', 'send', AWSSDKWrapper, AWSmod => AWSmod.Request.prototype)
-    patchModule('aws-sdk', 'promise', AWSSDKWrapper, AWSmod => AWSmod.Request.prototype)
-    patchModule('aws-sdk', 'addPromisesToClass', wrapPromiseOnAdd, AWSmod => AWSmod.Request)
-  }
+    patchModule('aws-sdk', 'send', AWSSDKWrapper, (AWSmod) => AWSmod.Request.prototype)
+    patchModule('aws-sdk', 'promise', AWSSDKWrapper, (AWSmod) => AWSmod.Request.prototype)
+    patchModule('aws-sdk', 'addPromisesToClass', wrapPromiseOnAdd, (AWSmod) => AWSmod.Request)
+  },
 }

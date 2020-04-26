@@ -58,7 +58,7 @@ export const getModules = function getModules(id: string) {
 
   const searchPaths: any[] = require.resolve.paths(id)!
 
-  searchPaths.forEach(path => {
+  searchPaths.forEach((path) => {
     const module = tryRequire(`${path}/${id}`) as any
     if (module) {
       modules.push(module)
@@ -72,7 +72,7 @@ export const patchModule = function patchModule(
   id: string,
   methodName: string,
   wrapper: any,
-  memberExtractor = (mod: any) => mod
+  memberExtractor = (mod: any) => mod,
 ) {
   const modules = getModules(id)
   modules.forEach((module: any) => {

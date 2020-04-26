@@ -34,8 +34,8 @@ function elasticSearchWrapper(wrappedFunction) {
           body: params.body,
           bulkBody: params.bulkBody,
           queryString: params.querystring,
-          operation: params.method
-        }
+          operation: params.method,
+        },
       })
 
       const patchedCallback = (err, result) => {
@@ -64,6 +64,6 @@ export const trackElasticsearch = () => {
     '@elastic/elasticsearch',
     'request',
     elasticSearchWrapper,
-    es => es.Transport.prototype
+    (es) => es.Transport.prototype,
   )
 }

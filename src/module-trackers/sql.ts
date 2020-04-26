@@ -32,8 +32,8 @@ export const wrapSqlQuery = function wrapSqlQuery(queryString, params, callback,
       driver,
       request: {
         query: queryString.substring(0, MAX_QUERY_SIZE),
-        parameters: isArray(params) ? params.slice(0, MAX_PARAMS_LENGTH) : undefined
-      }
+        parameters: isArray(params) ? params.slice(0, MAX_PARAMS_LENGTH) : undefined,
+      },
     })
 
     event.request.operation = 'query'

@@ -17,7 +17,7 @@ function mysqlQueryWrapper(wrappedFunction) {
       params = sql.values
       callback = sql.onResult
     } else {
-      ;({ params, callback } = parseQueryArgs(arg1, arg2))
+      ({ params, callback } = parseQueryArgs(arg1, arg2))
     }
 
     // eslint-disable-next-line no-underscore-dangle
@@ -48,14 +48,14 @@ function mysqlQueryWrapper(wrappedFunction) {
 }
 
 export const trackMysql = () => {
-  patchModule('mysql2', 'query', mysqlQueryWrapper, mysql2 => mysql2.Connection.prototype)
+  patchModule('mysql2', 'query', mysqlQueryWrapper, (mysql2) => mysql2.Connection.prototype)
 
-  patchModule('mysql2', 'execute', mysqlQueryWrapper, mysql2 => mysql2.Connection.prototype)
+  patchModule('mysql2', 'execute', mysqlQueryWrapper, (mysql2) => mysql2.Connection.prototype)
 
   patchModule(
     'mysql/lib/Connection.js',
     'query',
     mysqlQueryWrapper,
-    mysqlConnection => mysqlConnection.prototype
+    (mysqlConnection) => mysqlConnection.prototype,
   )
 }

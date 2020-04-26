@@ -7,12 +7,12 @@ const snsEventProperties = [
   'Message',
   'Timestamp',
   'SignatureVersion',
-  'Signature'
+  'Signature',
 ]
 
 export const getSNSTrigger = (messages: any[]) => {
   let snsEvent = null
-  messages.some(message => {
+  messages.some((message) => {
     try {
       let body = null
 

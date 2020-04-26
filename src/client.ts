@@ -14,7 +14,7 @@ const emptyTrace: any = {
   appName: process.env.TRACEMAN_APP_NAME,
   functionCallEvents: [],
   resourceAccessEvents: [],
-  status: 'OK'
+  status: 'OK',
 }
 
 export const functionStart = (fileName: string, functionName: string) => {
@@ -23,7 +23,7 @@ export const functionStart = (fileName: string, functionName: string) => {
   const event = {
     start: timestamp,
     fileName,
-    functionName
+    functionName,
   }
 
   if (trace) {
@@ -42,7 +42,7 @@ export const logTracerError = (err: Error) => {
 export const resourceAccessStart = (
   serviceName: string,
   resourceIdentifier?: string,
-  additionalData?: any
+  additionalData?: any,
 ) => {
   const timestamp = Date.now()
 
@@ -52,7 +52,7 @@ export const resourceAccessStart = (
     resourceIdentifier,
     request: {},
     response: {},
-    ...additionalData
+    ...additionalData,
   }
 
   trace.resourceAccessEvents.push(event)
@@ -105,9 +105,9 @@ export const sync = async () => {
       body: dataBuffer,
       headers: {
         'Content-Type': 'application/json',
-        'Content-Encoding': 'gzip'
+        'Content-Encoding': 'gzip',
       },
-      timeout: syncTimeout
+      timeout: syncTimeout,
     })
     console.log('sending took: ', Date.now() - timestamp, ' ms')
   } catch (e) {
@@ -156,7 +156,7 @@ export const wrapClass = (fileName: string, className: string, cls: any) => {
       cls.prototype[methodName] = wrapFunction(
         fileName,
         `${className}.${methodName}`,
-        cls.prototype[methodName]
+        cls.prototype[methodName],
       )
     }
   }
@@ -191,7 +191,7 @@ export const wrapLambdaHandler = (func: any) => {
 
           return sync().then(() => resolvedResult)
         })
-        .catch(err => {
+        .catch((err) => {
           functionEnd(event)
 
           setLambdaError(err)
