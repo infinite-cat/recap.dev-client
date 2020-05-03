@@ -10,8 +10,8 @@ const logResult = (result, event) => {
   event.response.statusCode = result.statusCode
   event.response.body = cloneDeep(result.body)
 
-  if (get(result, 'body.hits')) {
-    event.response.body.hits = result.body.hits.length
+  if (get(result, 'body.hits.hits')) {
+    event.response.body.hits.hits = result.body.hits.hits.length
   }
 
   return result
