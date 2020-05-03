@@ -1,5 +1,6 @@
 /* eslint-disable camelcase,no-undef,import/no-extraneous-dependencies,global-require */
 import shimmer from 'shimmer'
+import { serializeError as errorToObject } from 'serialize-error'
 
 let lastError: null | Error = null
 
@@ -80,4 +81,12 @@ export const patchModule = function patchModule(
       shimmer.wrap(memberExtractor(module), methodName, wrapper)
     }
   })
+}
+
+export const serializeError = (err?: Error) => {
+  if (!err) {
+    return null
+  }
+
+  return JSON.stringify(errorToObject(err))
 }

@@ -2,9 +2,9 @@ import fetch from 'node-fetch'
 import { gzipSync } from 'zlib'
 import { isFunction, cloneDeep } from 'lodash-es'
 import { Context } from 'aws-lambda'
-import { serializeError } from 'serialize-error'
 
 import { trackModules } from './module-trackers'
+import { serializeError } from './module-trackers/utils'
 
 trackModules()
 
@@ -69,7 +69,7 @@ export const setLambdaRequest = (request: any) => {
 }
 
 export const setLambdaError = (error: Error) => {
-  trace.error = JSON.stringify(serializeError(error))
+  trace.error = serializeError(error)
   trace.status = 'ERROR'
 }
 

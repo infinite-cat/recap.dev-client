@@ -1,7 +1,6 @@
-import { serializeError } from 'serialize-error'
 import { cloneDeep, get } from 'lodash-es'
 
-import { patchModule } from './utils'
+import { patchModule, serializeError } from './utils'
 import { resourceAccessStart } from '../client'
 
 const logResult = (result, event) => {
@@ -19,7 +18,7 @@ const logResult = (result, event) => {
 
 const logError = (err, event) => {
   event.end = Date.now()
-  event.error = JSON.stringify(serializeError(err))
+  event.error = serializeError(err)
   event.status = 'ERROR'
 
   throw err

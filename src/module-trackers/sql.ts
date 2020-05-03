@@ -1,8 +1,8 @@
 import { isArray, isEmpty, get } from 'lodash-es'
-import { serializeError } from 'serialize-error'
 import { Parser } from 'node-sql-parser'
 
 import { debugLog, resourceAccessStart } from '../client'
+import { serializeError } from './utils'
 
 const MAX_QUERY_SIZE = 2048
 const MAX_PARAMS_LENGTH = 5
@@ -78,7 +78,7 @@ export const wrapSqlQuery = function wrapSqlQuery(queryString, params, callback,
       event.end = endTime
       event.status = err ? 'ERROR' : 'OK'
       event.response.rowCount = rowCount
-      event.error = JSON.stringify(serializeError(err))
+      event.error = serializeError(err)
 
       if (callback) {
         callback(err, res, fields)
@@ -87,7 +87,7 @@ export const wrapSqlQuery = function wrapSqlQuery(queryString, params, callback,
   } catch (e) {
     if (event) {
       event.end = Date.now()
-      event.error = JSON.stringify(serializeError(e))
+      event.error = serializeError(e)
       event.status = 'ERROR'
     }
   }

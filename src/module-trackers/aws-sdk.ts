@@ -1,7 +1,5 @@
-import { serializeError } from 'serialize-error'
-
 import { debugLog, resourceAccessStart } from '../client'
-import { patchModule } from './utils'
+import { patchModule, serializeError } from './utils'
 import { getSNSTrigger } from './sqs-sns-trigger.utils'
 
 const s3EventCreator = {
@@ -444,7 +442,7 @@ function AWSSDKWrapper(wrappedFunction) {
         .on('error', (error) => {
           try {
             event.end = Date.now()
-            event.error = JSON.stringify(serializeError(error))
+            event.error = serializeError(error)
             event.status = 'ERROR'
           } catch (e) {
             debugLog(e)
