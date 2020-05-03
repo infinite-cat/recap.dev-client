@@ -33,15 +33,15 @@ export const functionStart = (fileName: string, functionName: string) => {
   return event
 }
 
-export const logTracerError = (err: Error) => {
-  if (process.env.DEBUG_TRACER) {
-    console.log(err)
+export const debugLog = (...args: any) => {
+  if (process.env.TRACEMAN_DEBUG_LOG) {
+    console.log(...args)
   }
 }
 
 export const resourceAccessStart = (
   serviceName: string,
-  resourceIdentifier?: string,
+  resourceIdentifier?: any,
   additionalData?: any,
 ) => {
   const timestamp = Date.now()
@@ -79,8 +79,8 @@ export const setLambdaResponse = (response: any) => {
 
 export const setLambdaContext = (context: any) => {
   trace.id = context && context.awsRequestId
-  trace.lambdaName = context && context.functionName
-  trace.lambdaContext = context
+  trace.unitName = context && context.functionName
+  trace.context = context
 }
 
 export const functionEnd = (event: any) => {
@@ -109,10 +109,10 @@ export const sync = async () => {
       },
       timeout: syncTimeout,
     })
-    console.log('sending took: ', Date.now() - timestamp, ' ms')
+    debugLog('sending took: ', Date.now() - timestamp, ' ms')
   } catch (e) {
-    console.warn('Warning: error when syncing trace data')
-    console.error(e)
+    debugLog('Warning: error when syncing trace data')
+    debugLog(e)
   }
 }
 

@@ -1,6 +1,8 @@
-import { isArray } from 'lodash-es'
+import { isArray, isEmpty, get } from 'lodash-es'
 import { serializeError } from 'serialize-error'
-import { resourceAccessStart } from '../client'
+import { Parser } from 'node-sql-parser'
+
+import { debugLog, resourceAccessStart } from '../client'
 
 const MAX_QUERY_SIZE = 2048
 const MAX_PARAMS_LENGTH = 5
@@ -13,11 +15,35 @@ export const parseQueryArgs = function parseQueryArgs(arg1, arg2) {
   return { params, callback }
 }
 
+export const extractSqlInformation = (query: string) => {
+  try {
+    const parser = new Parser()
+    const { tableList } = parser.parse(query)
+    if (!isEmpty(tableList)) {
+      const [operation, dbName, tableName] = tableList[0].split('::')
+      return { operation, dbName, tableName }
+    }
+  } catch (e) {
+    debugLog(`Failed to parse sql query: ${query}`, e)
+  }
+  return null
+}
+
 export const wrapSqlQuery = function wrapSqlQuery(queryString, params, callback, config, driver) {
   let patchedCallback
   let event
   try {
     const { database, host } = config
+
+    const resourceIdentifier: any = {
+      host,
+    }
+
+    const sqlData = extractSqlInformation(queryString)
+
+    if (sqlData) {
+      resourceIdentifier.tableName = sqlData.tableName
+    }
 
     let serviceName = 'sql'
     if (host.match('.rds.')) {
@@ -27,7 +53,7 @@ export const wrapSqlQuery = function wrapSqlQuery(queryString, params, callback,
       serviceName = 'redshift'
     }
 
-    event = resourceAccessStart(serviceName, host, {
+    event = resourceAccessStart(serviceName, resourceIdentifier, {
       database,
       driver,
       request: {
@@ -36,7 +62,7 @@ export const wrapSqlQuery = function wrapSqlQuery(queryString, params, callback,
       },
     })
 
-    event.request.operation = 'query'
+    event.request.operation = get(sqlData, 'operation', 'query')
 
     patchedCallback = (err, res, fields) => {
       const endTime = Date.now()

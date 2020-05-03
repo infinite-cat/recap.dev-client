@@ -1,6 +1,6 @@
 import { serializeError } from 'serialize-error'
 
-import { logTracerError, resourceAccessStart } from '../client'
+import { debugLog, resourceAccessStart } from '../client'
 import { patchModule } from './utils'
 import { getSNSTrigger } from './sqs-sns-trigger.utils'
 
@@ -438,7 +438,7 @@ function AWSSDKWrapper(wrappedFunction) {
           try {
             specificEventCreators[serviceIdentifier].requestHandler(request, event)
           } catch (e) {
-            logTracerError(e)
+            debugLog(e)
           }
         })
         .on('error', (error) => {
@@ -447,7 +447,7 @@ function AWSSDKWrapper(wrappedFunction) {
             event.error = JSON.stringify(serializeError(error))
             event.status = 'ERROR'
           } catch (e) {
-            logTracerError(e)
+            debugLog(e)
           }
         })
         .on('complete', (response) => {
@@ -468,11 +468,11 @@ function AWSSDKWrapper(wrappedFunction) {
               event.status = 'ERROR'
             }
           } catch (e) {
-            logTracerError(e)
+            debugLog(e)
           }
         })
     } catch (error) {
-      logTracerError(error)
+      debugLog(error)
     }
 
     return wrappedFunction.apply(this, [callback])
@@ -487,7 +487,7 @@ function wrapPromiseOnAdd(wrappedFunction) {
       // `promise` anyway
       patchModule('aws-sdk', 'promise', AWSSDKWrapper, (AWSmod) => AWSmod.Request.prototype)
     } catch (err) {
-      logTracerError(err)
+      debugLog(err)
     }
     return result
   }

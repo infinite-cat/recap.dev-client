@@ -28,7 +28,7 @@ const logError = (err, event) => {
 function elasticSearchWrapper(wrappedFunction) {
   function internalEsClientWrapper(params, options, callback) {
     if (callback) {
-      const event = resourceAccessStart('elasticsearch', params.path, {
+      const event = resourceAccessStart('elasticsearch', { path: params.path }, {
         request: {
           method: params.method,
           body: params.body,

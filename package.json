@@ -67,6 +67,7 @@
     ]
   },
   "devDependencies": {
+    "@elastic/elasticsearch": "^7.4.0",
     "@types/aws-lambda": "^8.10.48",
     "@types/jest": "^23.3.2",
     "@types/lodash-es": "^4.17.3",
@@ -93,7 +94,6 @@
     "lodash.camelcase": "^4.3.0",
     "mysql": "^2.18.1",
     "pg": "^8.0.3",
-    "@elastic/elasticsearch": "^7.4.0",
     "prompt": "^1.0.0",
     "replace-in-file": "^3.4.2",
     "rimraf": "^2.6.2",
@@ -115,6 +115,7 @@
   "dependencies": {
     "lodash-es": "^4.17.15",
     "node-fetch": "^2.6.0",
+    "node-sql-parser": "^1.9.1",
     "serialize-error": "^6.0.0",
     "shimmer": "^1.2.1"
   },
