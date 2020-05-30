@@ -77,7 +77,7 @@ export const patchModule = function patchModule(
 ) {
   const modules = getModules(id)
   modules.forEach((module: any) => {
-    if (!memberExtractor(module).tracemanWrapped) {
+    if (!memberExtractor(module).recapDevWrapped) {
       shimmer.wrap(memberExtractor(module), methodName, wrapper)
     }
   })

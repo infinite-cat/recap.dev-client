@@ -1,6 +1,6 @@
 {
-  "name": "@traceman/client",
-  "version": "1.0.3",
+  "name": "@recap.dev/client",
+  "version": "1.0.0",
   "description": "",
   "keywords": [],
   "main": "dist/client.umd.js",
@@ -12,7 +12,7 @@
   "author": "Arseny Yankovsky",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ArsenyYankovsky/traceman-client.git"
+    "url": "https://github.com/ArsenyYankovsky/recap.dev-client.git"
   },
   "license": "MIT",
   "engines": {

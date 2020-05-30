@@ -22,8 +22,6 @@ function mysqlQueryWrapper(wrappedFunction) {
 
     // eslint-disable-next-line no-underscore-dangle
     if (callback === undefined && sql._callback) {
-      // eslint-disable-line no-underscore-dangle
-      // In pool connection, no callback passed, but _callback is being used.
       callback = sql._callback // eslint-disable-line no-underscore-dangle
       overrideInnerCallback = true
     }
@@ -42,7 +40,7 @@ function mysqlQueryWrapper(wrappedFunction) {
   }
 
   // @ts-ignore
-  internalMySqlQueryWrapper.tracemanWrapped = true
+  internalMySqlQueryWrapper.recapDevWrapped = true
 
   return internalMySqlQueryWrapper
 }

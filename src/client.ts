@@ -11,7 +11,7 @@ trackModules()
 let trace: any
 
 const emptyTrace: any = {
-  appName: process.env.TRACEMAN_APP_NAME,
+  appName: process.env.RECAP_DEV_APP_NAME,
   functionCallEvents: [],
   resourceAccessEvents: [],
   status: 'OK',
@@ -34,7 +34,7 @@ export const functionStart = (fileName: string, functionName: string) => {
 }
 
 export const debugLog = (...args: any) => {
-  if (process.env.TRACEMAN_DEBUG_LOG) {
+  if (process.env.RECAP_DEV_DEBUG_LOG) {
     console.log(...args)
   }
 }
@@ -89,8 +89,8 @@ export const functionEnd = (event: any) => {
   event.end = timestamp
 }
 
-const syncTimeout = process.env.TRACEMAN_SYNC_TIMEOUT
-  ? Number(process.env.TRACEMAN_SYNC_TIMEOUT)
+const syncTimeout = process.env.RECAP_DEV_SYNC_TIMEOUT
+  ? Number(process.env.RECAP_DEV_SYNC_TIMEOUT)
   : 1000
 
 export const sync = async () => {
@@ -100,7 +100,7 @@ export const sync = async () => {
     const dataBuffer = gzipSync(Buffer.from(JSON.stringify(trace), 'utf-8'))
     console.log('sending bytes: ', Buffer.byteLength(dataBuffer))
 
-    await fetch(process.env.TRACEMAN_SYNC_ENDPOINT!, {
+    await fetch(process.env.RECAP_DEV_SYNC_ENDPOINT!, {
       method: 'POST',
       body: dataBuffer,
       headers: {

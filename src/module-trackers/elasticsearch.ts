@@ -53,7 +53,7 @@ function elasticSearchWrapper(wrappedFunction) {
     return wrappedFunction.apply(this, [params, options])
   }
 
-  internalEsClientWrapper.tracemanWrapped = true
+  internalEsClientWrapper.recapDevWrapped = true
 
   return internalEsClientWrapper
 }
