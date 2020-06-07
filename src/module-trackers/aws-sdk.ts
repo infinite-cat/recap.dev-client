@@ -192,11 +192,9 @@ const lambdaEventCreator = {
   requestHandler(request, event) {
     const parameters = request.params || {}
 
-    const name = parameters.FunctionName.includes(':')
-      ? parameters.FunctionName.split(':').slice(-1)[0]
-      : parameters.FunctionName
-
-    event.resourceIdentifier = name
+    event.resourceIdentifier = {
+      functionName: parameters.FunctionName,
+    }
     event.request.payload = parameters.Payload
   },
 
