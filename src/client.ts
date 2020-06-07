@@ -98,9 +98,13 @@ export const sync = async () => {
     const timestamp = Date.now()
 
     const dataBuffer = gzipSync(Buffer.from(JSON.stringify(trace), 'utf-8'))
-    console.log('sending bytes: ', Buffer.byteLength(dataBuffer))
 
-    await fetch(process.env.RECAP_DEV_SYNC_ENDPOINT!, {
+    if (!process.env.RECAP_DEV_SYNC_ENDPOINT) {
+      debugLog('RECAP_DEV_SYNC_ENDPOINT env variable is empty, skipping sync')
+      return
+    }
+
+    await fetch(process.env.RECAP_DEV_SYNC_ENDPOINT, {
       method: 'POST',
       body: dataBuffer,
       headers: {
