@@ -120,7 +120,11 @@ export const sync = async () => {
   }
 }
 
-const isPromise = (value: any) => value && isFunction(value.then)
+const isPromise = (value: any) => (
+  value &&
+  isFunction(value.then)
+  && Object.prototype.toString.call(value) === '[object Promise]'
+)
 
 export function wrapFunction(fileName: string, functionName: string, func: any) {
   if (func.recapDevWrapped) {
