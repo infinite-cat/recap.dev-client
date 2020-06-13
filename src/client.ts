@@ -121,8 +121,8 @@ export const sync = async () => {
 }
 
 const isPromise = (value: any) => (
-  value &&
-  isFunction(value.then)
+  value
+  && isFunction(value.then)
   && Object.prototype.toString.call(value) === '[object Promise]'
 )
 
