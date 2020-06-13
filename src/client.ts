@@ -123,7 +123,7 @@ export const sync = async () => {
 const isPromise = (value: any) => value && isFunction(value.then)
 
 export function wrapFunction(fileName: string, functionName: string, func: any) {
-  if (func.autotracerWrapped) {
+  if (func.recapDevWrapped) {
     return func
   }
 
@@ -147,13 +147,13 @@ export function wrapFunction(fileName: string, functionName: string, func: any) 
   }
 
   // @ts-ignore
-  wrappedFunction.autotracerWrapped = true
+  wrappedFunction.recapDevWrapped = true
 
   return wrappedFunction
 }
 
 export const wrapClass = (fileName: string, className: string, cls: any) => {
-  // TODO: somehow figue out how to use variable name instead of class name
+  // TODO: somehow figure out how to use variable name instead of class name
   for (const methodName of Object.getOwnPropertyNames(cls.prototype)) {
     if (isFunction(cls.prototype[methodName]) && methodName !== 'constructor') {
       // eslint-disable-next-line no-param-reassign
@@ -212,7 +212,7 @@ export const wrapLambdaHandler = (func: any) => {
     return sync().then(() => result)
   }
 
-  wrappedLambdaHandler.autotracerWrapped = true
+  wrappedLambdaHandler.recapDevWrapped = true
 
   return wrappedLambdaHandler
 }
