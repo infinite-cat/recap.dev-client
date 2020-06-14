@@ -80,6 +80,7 @@ export const setLambdaResponse = (response: any) => {
 export const setLambdaContext = (context: any) => {
   trace.id = context && context.awsRequestId
   trace.unitName = context && context.functionName
+  trace.unitType = 'AWS_LAMBDA'
   trace.context = context
 }
 
@@ -174,7 +175,6 @@ export const wrapLambdaHandler = (func: any) => {
   const wrappedLambdaHandler: any = async (request: any, context: Context) => {
     trace = cloneDeep(emptyTrace)
     const event: any = functionStart('', context.functionName)
-    console.log('starting event ', JSON.stringify(event))
     setLambdaRequest({ ...request })
 
     setLambdaContext(context)
