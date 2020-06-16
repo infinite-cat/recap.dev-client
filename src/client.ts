@@ -15,6 +15,7 @@ const emptyTrace: any = {
   functionCallEvents: [],
   resourceAccessEvents: [],
   status: 'OK',
+  extraData: {},
 }
 
 export const functionStart = (fileName: string, functionName: string) => {
@@ -82,6 +83,7 @@ export const setLambdaContext = (context: any) => {
   trace.unitName = context && context.functionName
   trace.unitType = 'AWS_LAMBDA'
   trace.context = context
+  trace.extraData.awsRegion = process.env.AWS_REGION
 }
 
 export const functionEnd = (event: any) => {
