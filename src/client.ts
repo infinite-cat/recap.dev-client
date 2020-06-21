@@ -117,7 +117,7 @@ export const sync = async () => {
       },
       timeout: syncTimeout,
     })
-    debugLog('sending took: ', Date.now() - timestamp, ' ms')
+    debugLog('recap.dev syncing took: ', Date.now() - timestamp, ' ms')
   } catch (e) {
     debugLog('Warning: error when syncing trace data')
     debugLog(e)
