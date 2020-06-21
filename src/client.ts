@@ -178,12 +178,16 @@ const timeoutWindow = process.env.RECAP_DEV_TIMEOUT_WINDOW ? Number(process.env.
 
 export const wrapLambdaHandler = (func: any) => {
   const wrappedLambdaHandler: any = async (request: any, context: Context) => {
-    const timeoutHandler = setTimeout(() => {
-      trace.error = serializeError(new LambdaTimeoutError('Lambda Invocation Timeout'))
-      sync()
-    }, context.getRemainingTimeInMillis() - timeoutWindow)
     trace = cloneDeep(emptyTrace)
     const event: any = functionStart('', context.functionName)
+
+    const timeoutHandler = setTimeout(() => {
+      functionEnd(event)
+
+      setLambdaError(new LambdaTimeoutError('Lambda Invocation Timeout'))
+      sync()
+    }, context.getRemainingTimeInMillis() - timeoutWindow)
+
     setLambdaRequest({ ...request })
 
     setLambdaContext(context)
