@@ -5,6 +5,7 @@ import { Context } from 'aws-lambda'
 
 import { trackModules } from './module-trackers'
 import { serializeError } from './module-trackers/utils'
+import { LambdaTimeoutError } from './lambda-timeout-error'
 
 trackModules()
 
@@ -173,8 +174,14 @@ export const wrapClass = (fileName: string, className: string, cls: any) => {
   }
 }
 
+const timeoutWindow = process.env.RECAP_DEV_TIMEOUT_WINDOW ? Number(process.env.RECAP_DEV_TIMEOUT_WINDOW) : 200
+
 export const wrapLambdaHandler = (func: any) => {
   const wrappedLambdaHandler: any = async (request: any, context: Context) => {
+    const timeoutHandler = setTimeout(() => {
+      trace.error = serializeError(new LambdaTimeoutError('Lambda Invocation Timeout'))
+      sync()
+    }, context.getRemainingTimeInMillis() - timeoutWindow)
     trace = cloneDeep(emptyTrace)
     const event: any = functionStart('', context.functionName)
     setLambdaRequest({ ...request })
@@ -188,6 +195,7 @@ export const wrapLambdaHandler = (func: any) => {
     } catch (e) {
       functionEnd(event)
       setLambdaError(e.toString())
+      clearTimeout(timeoutHandler)
       await sync()
       throw e
     }
@@ -206,6 +214,7 @@ export const wrapLambdaHandler = (func: any) => {
 
           setLambdaError(err)
 
+          clearTimeout(timeoutHandler)
           return sync().then(() => {
             throw err
           })
@@ -215,6 +224,7 @@ export const wrapLambdaHandler = (func: any) => {
     setLambdaResponse(result)
     functionEnd(event)
 
+    clearTimeout(timeoutHandler)
     return sync().then(() => result)
   }
 
