@@ -1,10 +1,11 @@
-import {serializeError} from "./module-trackers/utils";
-import {gzipSync} from "zlib";
-import {debugLog} from "./log";
-import fetch from "node-fetch";
-import {cloneDeep, isFunction} from "lodash-es";
-import {Context} from "aws-lambda";
-import {LambdaTimeoutError} from "./lambda-timeout-error";
+import { gzipSync } from 'zlib'
+import fetch from 'node-fetch'
+import { cloneDeep, isFunction } from 'lodash-es'
+import { Context } from 'aws-lambda'
+
+import { debugLog } from './log'
+import { serializeError } from './module-trackers/utils'
+import { LambdaTimeoutError } from './lambda-timeout-error'
 
 let trace: any
 
@@ -179,7 +180,7 @@ export const wrapLambdaHandler = (func: any) => {
       sync()
     }, context.getRemainingTimeInMillis() - timeoutWindow)
 
-    setLambdaRequest({...request})
+    setLambdaRequest({ ...request })
 
     setLambdaContext(context)
 
