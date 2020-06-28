@@ -4,9 +4,10 @@ import urlLib from 'url'
 import shimmer from 'shimmer'
 
 import { addChunk, decodeJson, isUrlIgnored } from './utils'
-import { debugLog, resourceAccessStart } from '../../client'
+import { debugLog } from '../../log'
 import { disablePayloadCapture } from '../../config'
 import { serializeError, patchModule } from '../utils'
+import { resourceAccessStart } from '../../trace'
 
 function buildParams(url, options, callback) {
   if (url && options) {

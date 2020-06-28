@@ -1,6 +1,7 @@
-import { debugLog, resourceAccessStart } from '../client'
 import { patchModule, serializeError } from './utils'
 import { getSNSTrigger } from './sqs-sns-trigger.utils'
+import { resourceAccessStart } from '../trace'
+import { debugLog } from '../log'
 
 const s3EventCreator = {
   requestHandler(request: any, event: any) {

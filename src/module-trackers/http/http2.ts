@@ -2,8 +2,9 @@ import shimmer from 'shimmer'
 import urlLib from 'url'
 import { serializeError, tryRequire } from '../utils'
 import { addChunk, decodeJson, isUrlIgnored } from './utils'
-import { debugLog, resourceAccessStart } from '../../client'
 import { disablePayloadCapture } from '../../config'
+import { debugLog } from '../../log'
+import { resourceAccessStart } from '../../trace'
 
 const http2 = tryRequire('http2')
 

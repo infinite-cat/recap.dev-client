@@ -1,7 +1,8 @@
 import { isArray, isEmpty, get } from 'lodash-es'
 import { Parser } from 'node-sql-parser'
 
-import { debugLog, resourceAccessStart } from '../client'
+import { debugLog } from '../log'
+import { resourceAccessStart } from '../trace'
 import { serializeError } from './utils'
 
 const MAX_QUERY_SIZE = 2048

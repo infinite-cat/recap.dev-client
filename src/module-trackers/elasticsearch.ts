@@ -1,7 +1,7 @@
 import { cloneDeep, get } from 'lodash-es'
 
 import { patchModule, serializeError } from './utils'
-import { resourceAccessStart } from '../client'
+import { resourceAccessStart } from '../trace'
 
 const logResult = (result, event) => {
   event.end = Date.now()

@@ -1,7 +1,7 @@
 import zlib from 'zlib'
 import urlLib from 'url'
 
-import { debugLog } from '../../client'
+import { debugLog } from '../../log'
 
 export const extractHostname = (url?: string): string => {
   if (!url) {
@@ -68,7 +68,7 @@ export const decodeJson = (data, encoding) => {
     JSON.parse(jsonData)
     return jsonData.toString()
   } catch (err) {
-    debugLog('Could not parse JSON')
+    debugLog('Could not parse JSON', err)
   }
   return undefined
 }
