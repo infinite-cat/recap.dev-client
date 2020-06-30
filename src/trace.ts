@@ -176,7 +176,6 @@ export const wrapLambdaHandler = (func: any) => {
     const timeoutHandler = setTimeout(() => {
       functionEnd(event)
 
-      setLambdaError(new LambdaTimeoutError('Lambda Invocation Timeout'))
       sync()
     }, context.getRemainingTimeInMillis() - timeoutWindow)
 
