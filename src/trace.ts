@@ -5,7 +5,6 @@ import { Context } from 'aws-lambda'
 
 import { debugLog } from './log'
 import { serializeError } from './module-trackers/utils'
-import { LambdaTimeoutError } from './lambda-timeout-error'
 
 let trace: any
 
