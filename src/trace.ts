@@ -76,6 +76,9 @@ export const setLambdaContext = (context: any) => {
   trace.unitType = 'AWS_LAMBDA'
   trace.context = context
   trace.extraData.awsRegion = process.env.AWS_REGION
+  trace.extraData.awsAccountId = context
+    && context.invokedFunctionArn
+    && context.invokedFunctionArn.split(':')[4]
 }
 
 export const functionEnd = (event: any) => {
