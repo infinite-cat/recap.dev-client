@@ -79,6 +79,7 @@ export const setLambdaContext = (context: any) => {
   trace.extraData.awsAccountId = context
     && context.invokedFunctionArn
     && context.invokedFunctionArn.split(':')[4]
+  trace.extraData.awsLogStreamName = context && context.logStreamName
 }
 
 export const functionEnd = (event: any) => {
