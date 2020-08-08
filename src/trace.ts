@@ -125,10 +125,6 @@ const isPromise = (value: any) => (
   && Object.prototype.toString.call(value) === '[object Promise]'
 )
 
-const isNonStrictPromise = (obj) => (
-  !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function'
-)
-
 export function wrapFunction(fileName: string, functionName: string, func: any) {
   if (func.recapDevWrapped) {
     return func
@@ -202,12 +198,14 @@ export const wrapLambdaHandler = (func: any) => {
       throw e
     }
 
-    if (isNonStrictPromise(result)) {
+    if (isPromise(result)) {
       return result
         .then((resolvedResult: any) => {
           functionEnd(event)
 
           setLambdaResponse(resolvedResult)
+
+          clearTimeout(timeoutHandler)
 
           return sync().then(() => resolvedResult)
         })
