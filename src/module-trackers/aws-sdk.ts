@@ -1,7 +1,7 @@
 import { patchModule, serializeError } from './utils'
 import { getSNSTrigger } from './sqs-sns-trigger.utils'
-import { resourceAccessStart } from '../trace'
 import { debugLog } from '../log'
+import { tracer } from '../tracer'
 
 const s3EventCreator = {
   requestHandler(request: any, event: any) {
@@ -149,8 +149,7 @@ const SQSEventCreator = {
         let messagesNumber = 0
         if ('Messages' in response.data && response.data.Messages.length > 0) {
           messagesNumber = response.data.Messages.length
-          const messageIds = response.data.Messages.map((x) => x.MessageId)
-          event.response.messageIds = messageIds
+          event.response.messageIds = response.data.Messages.map((x) => x.MessageId)
           event.response.snsTrigger = getSNSTrigger(response.data.Messages)
           event.response.messagesNumber = messagesNumber
         }
@@ -420,7 +419,7 @@ function AWSSDKWrapper(wrappedFunction) {
         return wrappedFunction.apply(this, [callback])
       }
 
-      const event: any = resourceAccessStart(serviceIdentifier, undefined, {
+      const event = tracer.resourceAccessStart(serviceIdentifier, undefined, {
         request: {
           operation: request.operation,
         },

@@ -1,5 +1,7 @@
+import { config } from './config'
+
 export const debugLog = (...args: any) => {
-  if (process.env.RECAP_DEV_DEBUG_LOG) {
+  if (config.isDebugLogEnabled) {
     console.log(...args)
   }
 }

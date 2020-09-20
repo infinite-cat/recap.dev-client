@@ -1,7 +1,7 @@
 import { cloneDeep, get } from 'lodash-es'
 
 import { patchModule, serializeError } from './utils'
-import { resourceAccessStart } from '../trace'
+import { tracer } from '../tracer'
 
 const logResult = (result, event) => {
   event.end = Date.now()
@@ -27,7 +27,7 @@ const logError = (err, event) => {
 function elasticSearchWrapper(wrappedFunction) {
   function internalEsClientWrapper(params, options, callback) {
     if (callback) {
-      const event = resourceAccessStart('elasticsearch', { path: params.path }, {
+      const event = tracer.resourceAccessStart('elasticsearch', { path: params.path }, {
         request: {
           method: params.method,
           body: params.body,

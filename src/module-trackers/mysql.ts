@@ -26,7 +26,7 @@ function mysqlQueryWrapper(wrappedFunction) {
       overrideInnerCallback = true
     }
 
-    const patchedCallback = wrapSqlQuery(queryString, params, callback, this.config, 'mysql')
+    const patchedCallback = wrapSqlQuery(queryString, params, callback, this.config, 'MySQL')
     if (sql.onResult) {
       sql.onResult = patchedCallback
     } else {

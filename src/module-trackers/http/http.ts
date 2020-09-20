@@ -5,9 +5,9 @@ import shimmer from 'shimmer'
 
 import { addChunk, decodeJson, isUrlIgnored } from './utils'
 import { debugLog } from '../../log'
-import { disablePayloadCapture } from '../../config'
+import { config } from '../../config'
 import { serializeError, patchModule } from '../utils'
-import { resourceAccessStart } from '../../trace'
+import { tracer } from '../../tracer'
 
 function buildParams(url, options, callback) {
   if (url && options) {
@@ -158,7 +158,7 @@ function httpWrapper(wrappedFunction) {
 
       const requestUrl = `${protocol}://${hostname}${pathname}`
 
-      const event = resourceAccessStart(hostname, {
+      const event = tracer.resourceAccessStart(hostname, {
         host: hostname,
         url: requestUrl,
       }, {
@@ -211,7 +211,7 @@ function httpWrapper(wrappedFunction) {
       if (
         options
         && options.recapDevSkipResponseData
-        && disablePayloadCapture
+        && config.disablePayloadCapture
       ) {
         shimmer.wrap(
           clientRequest,
@@ -291,7 +291,7 @@ function httpWrapper(wrappedFunction) {
       clientRequest.on('response', (res) => {
         if (
           (!options || (options && !options.recapDevSkipResponseData))
-            && !disablePayloadCapture
+            && !config.disablePayloadCapture
         ) {
           res.on('data', (chunk) => addChunk(chunk, chunks))
         }

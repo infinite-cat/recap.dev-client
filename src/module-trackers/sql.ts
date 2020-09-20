@@ -2,8 +2,8 @@ import { isArray, isEmpty, get } from 'lodash-es'
 import { Parser } from 'node-sql-parser'
 
 import { debugLog } from '../log'
-import { resourceAccessStart } from '../trace'
 import { serializeError } from './utils'
+import { tracer } from '../tracer'
 
 const MAX_QUERY_SIZE = 2048
 const MAX_PARAMS_LENGTH = 5
@@ -54,7 +54,7 @@ export const wrapSqlQuery = function wrapSqlQuery(queryString, params, callback,
       serviceName = 'redshift'
     }
 
-    event = resourceAccessStart(serviceName, resourceIdentifier, {
+    event = tracer.resourceAccessStart(serviceName, resourceIdentifier, {
       database,
       driver,
       request: {

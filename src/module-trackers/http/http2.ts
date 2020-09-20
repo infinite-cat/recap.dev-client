@@ -2,9 +2,9 @@ import shimmer from 'shimmer'
 import urlLib from 'url'
 import { serializeError, tryRequire } from '../utils'
 import { addChunk, decodeJson, isUrlIgnored } from './utils'
-import { disablePayloadCapture } from '../../config'
+import { config } from '../../config'
 import { debugLog } from '../../log'
-import { resourceAccessStart } from '../../trace'
+import { tracer } from '../../tracer'
 
 const http2 = tryRequire('http2')
 
@@ -35,7 +35,7 @@ function httpWrapper(wrappedFunction, authority) {
       // headers['recap-dev-trace-id'] = recapDevTraceId
       //
 
-      event = resourceAccessStart(hostname!, {
+      event = tracer.resourceAccessStart(hostname!, {
         host: hostname,
         url: authority,
       }, {
@@ -63,7 +63,7 @@ function httpWrapper(wrappedFunction, authority) {
     try {
       const chunks: Buffer[] = []
       let responseHeaders
-      if (!disablePayloadCapture) {
+      if (!config.disablePayloadCapture) {
         clientRequest!.on('data', (chunk) => {
           addChunk(chunk, chunks)
         })
@@ -82,9 +82,8 @@ function httpWrapper(wrappedFunction, authority) {
       clientRequest.once('close', () => {
         event.end = Date.now()
 
-        if (!disablePayloadCapture) {
-          const response = decodeJson(Buffer.concat(chunks), responseHeaders['content-encoding'])
-          event.response.body = response
+        if (!config.disablePayloadCapture) {
+          event.response.body = decodeJson(Buffer.concat(chunks), responseHeaders['content-encoding'])
         }
       })
 

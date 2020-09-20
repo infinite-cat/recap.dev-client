@@ -1,9 +1,6 @@
 import { parseQueryArgs, wrapSqlQuery } from './sql'
 import { patchModule } from './utils'
-
-const pgPath = process.env.RECAP_DEV_POSTGRES_MODULE
-  ? `${process.cwd()}${process.env.RECAP_DEV_POSTGRES_MODULE}`
-  : 'pg'
+import { config } from '../config'
 
 function pgClientWrapper(wrappedFunction) {
   return function internalPgClientWrapper(queryString, arg1, arg2) {
@@ -30,7 +27,7 @@ function pgClientWrapper(wrappedFunction) {
       sqlParams,
       callback,
       this.connectionParameters || this._clients[0], // eslint-disable-line
-      'pg',
+      'PostgreSQL',
     )
 
     if (callback) {
@@ -58,7 +55,7 @@ function pgClientWrapper(wrappedFunction) {
 }
 
 export const trackPostgres = () => {
-  patchModule(pgPath, 'query', pgClientWrapper, (pg) => pg.Client.prototype)
+  patchModule(config.pgDriverModulePath, 'query', pgClientWrapper, (pg) => pg.Client.prototype)
 
   patchModule('pg-pool', 'query', pgClientWrapper, (Pool) => Pool.prototype)
 }
