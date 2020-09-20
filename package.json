@@ -116,7 +116,7 @@
   "dependencies": {
     "lodash-es": "^4.17.15",
     "node-fetch": "^2.6.0",
-    "node-sql-parser": "^1.9.1",
+    "node-sql-parser": "^3.1.0",
     "serialize-error": "^6.0.0",
     "shimmer": "^1.2.1",
     "uuid": "^8.3.0"

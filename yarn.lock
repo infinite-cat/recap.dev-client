@@ -6278,10 +6278,10 @@ node-releases@^1.1.53:
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.53.tgz#2d821bfa499ed7c5dffc5e2f28c88e78a08ee3f4"
   integrity sha512-wp8zyQVwef2hpZ/dJH7SfSrIPD6YoJz6BDQDpGEkcA0s3LpAQoxBIYmfIq6QAhC1DhwsyCgTaTTcONwX8qzCuQ==
 
-node-sql-parser@^1.9.1:
-  version "1.9.1"
-  resolved "https://registry.yarnpkg.com/node-sql-parser/-/node-sql-parser-1.9.1.tgz#a5fc440db4a57563c3f625f2f2a867cef40d58df"
-  integrity sha512-ThVm5XnVZ09zgSZ8Dd/WX+aFLwliYVKTrLJWSxLHWuJdZW8JRbUGy4QQROGsOiU5z/jf9ooH3JRiL0Mgiw5rsg==
+node-sql-parser@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/node-sql-parser/-/node-sql-parser-3.1.0.tgz#997e51581e89a218a91cabc2e863b072b5f9969f"
+  integrity sha512-bm1vct9T8EtPi4/z8GA/UbN/xEwfUQsqhvmgnwyNMRSiQ4jvukCE4Esl363HbnBnXFhc5T4V9DuO29pWtC0q6w==
   dependencies:
     big-integer "^1.6.48"
 

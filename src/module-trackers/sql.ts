@@ -1,5 +1,5 @@
 import { isArray, isEmpty, get } from 'lodash-es'
-import { Parser } from 'node-sql-parser'
+import sqlParser from 'node-sql-parser'
 
 import { debugLog } from '../log'
 import { serializeError } from './utils'
@@ -16,10 +16,10 @@ export const parseQueryArgs = function parseQueryArgs(arg1, arg2) {
   return { params, callback }
 }
 
-export const extractSqlInformation = (query: string) => {
+export const extractSqlInformation = (query: string, driver: string) => {
   try {
-    const parser = new Parser()
-    const { tableList } = parser.parse(query)
+    const parser = new sqlParser.Parser()
+    const { tableList } = parser.parse(query, { database: driver })
     if (!isEmpty(tableList)) {
       const [operation, dbName, tableName] = tableList[0].split('::')
       return { operation, dbName, tableName }
@@ -40,7 +40,7 @@ export const wrapSqlQuery = function wrapSqlQuery(queryString, params, callback,
       host,
     }
 
-    const sqlData = extractSqlInformation(queryString)
+    const sqlData = extractSqlInformation(queryString, driver)
 
     if (sqlData) {
       resourceIdentifier.tableName = sqlData.tableName
