@@ -28,4 +28,4 @@ recap.dev is an open-source cloud observability and tracing solution for modern 
 
 **recap.dev-client** repository contains source-code for a client-side Node.js tracing library. 
 
-[Learn how to use this plugin to integrate your application with recap.dev](https://recap.dev/docs/tracing)
+[Learn how to use this library to trace your application with recap.dev](https://recap.dev/docs/tracing)
