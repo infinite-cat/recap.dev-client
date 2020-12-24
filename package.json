@@ -1,8 +1,9 @@
 {
   "name": "@recap.dev/client",
   "version": "1.0.0",
-  "description": "",
-  "keywords": [],
+  "description": "Client library for recap.dev, an open-source cloud observability and tracing solution for modern JavaScript backends.",
+  "keywords": ["tracing", "monitoring", "server monitoring", "observability", "dashboard"],
+  "homepage": "https://recap.dev/",
   "main": "dist/client.umd.js",
   "module": "dist/client.es5.js",
   "typings": "dist/types/client.d.ts",
@@ -12,7 +13,7 @@
   "author": "Arseny Yankovsky",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ArsenyYankovsky/recap.dev-client.git"
+    "url": "https://github.com/infinite-cat/recap.dev-client.git"
   },
   "license": "MIT",
   "engines": {
