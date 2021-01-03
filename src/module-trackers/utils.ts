@@ -26,6 +26,11 @@ export const tryRequire: any = (id: string) => {
       // @ts-ignore
       return require('@elastic/elasticsearch')
     }
+
+    if (id === 'mongodb') {
+      // @ts-ignore
+      return require('mongodb')
+    }
   } catch (e) {
     lastError = e
   }
