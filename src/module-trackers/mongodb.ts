@@ -76,6 +76,7 @@ function onStartHook(event: any) {
     }, {
       request: {
         ...event.command,
+        operation: event.commandName,
       },
     })
 
