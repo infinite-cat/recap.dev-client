@@ -183,7 +183,7 @@ export class Tracer {
         timeout: config.syncTimeout,
       })
 
-      debugLog('recap.dev syncing took: ', Date.now() - timestamp, ' ms')
+      debugLog('recap.dev sync took: ', Date.now() - timestamp, ' ms')
     } catch (e) {
       debugLog('Warning: error when syncing trace data')
       debugLog(e)

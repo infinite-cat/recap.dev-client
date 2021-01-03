@@ -9,12 +9,10 @@ const eventsMap = {}
 const getResponse = (event) => {
   const { commandName, reply } = event
 
-  console.log(reply)
-
   switch (commandName) {
     case 'find':
       if (reply.cursor && Array.isArray(reply.cursor.firstBatch)) {
-        return { itemsCount: reply.cursor.firstBatch.length }
+        return { itemsCount: reply.cursor.firstBatch.length, firstBatch: reply.cursor.firstBatch }
       }
       if (Array.isArray(reply)) {
         return { reply }
@@ -22,7 +20,7 @@ const getResponse = (event) => {
       break
     case 'getMore':
       if (reply.cursor && Array.isArray(reply.cursor.nextBatch)) {
-        return { itemsCount: reply.cursor.nextBatch.length }
+        return { itemsCount: reply.cursor.nextBatch.length, nextBatch: reply.cursor.nextBatch }
       }
       if (Array.isArray(reply)) {
         return { reply }
