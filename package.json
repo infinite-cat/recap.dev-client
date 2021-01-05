@@ -117,6 +117,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "reflect-metadata": "^0.1.13",
     "lodash-es": "^4.17.15",
     "node-fetch": "^2.6.0",
     "node-sql-parser": "^3.1.0",
