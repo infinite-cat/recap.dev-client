@@ -8,6 +8,8 @@ import { tracer } from '../tracer'
 import { AsyncHooksTraceStore } from '../services/async-hooks-trace-store'
 import { Trace } from '../entities'
 import { debugLog } from '../log'
+import { safeParse } from '../utils'
+import { config } from '../config'
 
 const newExpressTrace = (req) => {
   const trace = new Trace(uuidv4(), process.env.RECAP_DEV_APP_NAME || req.hostname, 'EXPRESS_HANDLER')
@@ -18,7 +20,6 @@ const newExpressTrace = (req) => {
     method: req.method,
     params: req.params,
     query: req.query,
-    body: req.body,
   }
   trace.start = Date.now()
 
@@ -78,8 +79,43 @@ function wrapUse(original) {
   }
 }
 
+const appendBodyChunk = (chunk, body) => {
+  if (chunk && body.length < config.maxPayloadLength) {
+    return body + chunk
+  }
+  return body
+}
+
 const recapExpressMiddleware = (req, res, next) => {
   const originalUrl = urlLib.parse(req.originalUrl)
+  const originalWrite = res.write
+  const originalEnd = res.end
+
+  let trace: Trace
+  let reqBody = ''
+  let resBody = ''
+
+  // Handling request body
+  req.on('data', (chunk) => {
+    reqBody = appendBodyChunk(chunk, reqBody)
+  })
+
+  req.on('end', (chunk) => {
+    reqBody = appendBodyChunk(chunk, reqBody)
+    trace.request.body = safeParse(reqBody) || reqBody
+    next()
+  })
+
+  // Handling response body
+  res.write = function write(...args) {
+    resBody = appendBodyChunk(args[0], resBody)
+    return originalWrite.apply(res, args)
+  }
+
+  res.end = function end(...args) {
+    resBody = appendBodyChunk(args[0], resBody)
+    originalEnd.apply(res, args)
+  }
 
   if (isUrlIgnored(originalUrl.path, originalUrl.hostname)) {
     debugLog(`Ignoring request: ${req.method} ${req.originalUrl}`)
@@ -87,7 +123,6 @@ const recapExpressMiddleware = (req, res, next) => {
     return
   }
 
-  let trace: Trace
   try {
     trace = tracer.startNewTrace(newExpressTrace(req))
 
@@ -98,6 +133,7 @@ const recapExpressMiddleware = (req, res, next) => {
         trace.response = {
           headers: res.getHeaders(),
           statusCode: res.statusCode,
+          body: safeParse(resBody) || resBody,
         }
         tracer.functionEnd(handlerFunctionEvent)
         trace.end = Date.now()
@@ -115,7 +151,6 @@ const recapExpressMiddleware = (req, res, next) => {
     })
   } catch (err) {
     debugLog(err)
-  } finally {
     next()
   }
 }
