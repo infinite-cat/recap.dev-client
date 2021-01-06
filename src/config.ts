@@ -7,6 +7,10 @@ class Config {
     return process.env.RECAP_DEV_SYNC_TIMEOUT ? Number(process.env.RECAP_DEV_SYNC_TIMEOUT) : 1000
   }
 
+  get maxPayloadLength() {
+    return process.env.RECAP_DEV_MAX_PAYLOAD ? Number(process.env.RECAP_DEV_MAX_PAYLOAD) : 10000
+  }
+
   get syncEndpoint() {
     return process.env.RECAP_DEV_SYNC_ENDPOINT
   }
