@@ -26423,11 +26423,7 @@
 
     var newVercelTrace = function (request) {
         var trace = new Trace(v4(), request.path, 'VERCEL');
-        trace.request = {
-            headers: request.getHeaders(),
-            url: request.path,
-            method: request.method,
-        };
+        trace.request = {};
         return trace;
     };
     /**

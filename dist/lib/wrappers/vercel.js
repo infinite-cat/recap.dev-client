@@ -7,11 +7,7 @@ var tracer_1 = require("../tracer");
 var log_1 = require("../log");
 var newVercelTrace = function (request) {
     var trace = new entities_1.Trace(uuid_1.v4(), request.path, 'VERCEL');
-    trace.request = {
-        headers: request.getHeaders(),
-        url: request.path,
-        method: request.method,
-    };
+    trace.request = {};
     return trace;
 };
 /**
