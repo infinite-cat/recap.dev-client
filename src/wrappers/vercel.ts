@@ -1,4 +1,4 @@
-import { ClientRequest, ServerResponse } from 'http'
+import { ServerResponse } from 'http'
 import { v4 as uuidv4 } from 'uuid'
 
 import { captureConsoleLogs } from './console'
@@ -6,10 +6,16 @@ import { Trace } from '../entities'
 import { tracer } from '../tracer'
 import { debugLog } from '../log'
 
-const newVercelTrace = (request: ClientRequest) => {
+const newVercelTrace = (request: any) => {
   const trace = new Trace(uuidv4(), request.path, 'VERCEL')
 
   trace.request = {
+    headers: request.rawHeaders,
+    url: request.url,
+    method: request.method,
+    params: request.params,
+    query: request.query,
+    body: request.body,
   }
 
   return trace
@@ -42,7 +48,8 @@ export const wrapVercelHandler = (func) => {
         debugLog(err)
         tracer.setTraceError(err)
       }
-      tracer.sync()
+      tracer.sync().then(() => {
+      })
     })
 
     func(request, response)

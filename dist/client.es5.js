@@ -26418,7 +26418,14 @@ var wrapNestJsModule = function (module) {
 
 var newVercelTrace = function (request) {
     var trace = new Trace(v4(), request.path, 'VERCEL');
-    trace.request = {};
+    trace.request = {
+        headers: request.rawHeaders,
+        url: request.url,
+        method: request.method,
+        params: request.params,
+        query: request.query,
+        body: request.body,
+    };
     return trace;
 };
 /**
@@ -26446,7 +26453,8 @@ var wrapVercelHandler = function (func) {
                 debugLog(err);
                 tracer.setTraceError(err);
             }
-            tracer.sync();
+            tracer.sync().then(function () {
+            });
         });
         func(request, response);
     };

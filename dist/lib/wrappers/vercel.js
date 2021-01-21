@@ -7,7 +7,14 @@ var tracer_1 = require("../tracer");
 var log_1 = require("../log");
 var newVercelTrace = function (request) {
     var trace = new entities_1.Trace(uuid_1.v4(), request.path, 'VERCEL');
-    trace.request = {};
+    trace.request = {
+        headers: request.rawHeaders,
+        url: request.url,
+        method: request.method,
+        params: request.params,
+        query: request.query,
+        body: request.body,
+    };
     return trace;
 };
 /**
@@ -35,7 +42,8 @@ exports.wrapVercelHandler = function (func) {
                 log_1.debugLog(err);
                 tracer_1.tracer.setTraceError(err);
             }
-            tracer_1.tracer.sync();
+            tracer_1.tracer.sync().then(function () {
+            });
         });
         func(request, response);
     };
