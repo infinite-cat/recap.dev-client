@@ -1,4 +1,3 @@
-import { ServerResponse } from 'http'
 import { v4 as uuidv4 } from 'uuid'
 
 import { captureConsoleLogs } from './console'
@@ -39,7 +38,7 @@ export const wrapVercelHandler = (func) => {
     let resBody = ''
 
     // Handling response body
-    response.write = function write(...args) {
+    response.write = function write(...args: any[]) {
       resBody = appendBodyChunk(args[0], resBody)
       return originalWrite.apply(response, args)
     }
@@ -51,6 +50,7 @@ export const wrapVercelHandler = (func) => {
 
     response.once('finish', () => {
       try {
+        debugLog('response body: ', resBody)
         trace.response = {
           headers: response.getHeaders(),
           statusCode: response.statusCode,

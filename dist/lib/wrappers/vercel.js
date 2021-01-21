@@ -49,6 +49,7 @@ exports.wrapVercelHandler = function (func) {
         };
         response.once('finish', function () {
             try {
+                log_1.debugLog('response body: ', resBody);
                 trace.response = {
                     headers: response.getHeaders(),
                     statusCode: response.statusCode,

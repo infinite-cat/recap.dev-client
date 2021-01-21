@@ -26513,6 +26513,7 @@
             };
             response.once('finish', function () {
                 try {
+                    debugLog('response body: ', resBody);
                     trace.response = {
                         headers: response.getHeaders(),
                         statusCode: response.statusCode,
