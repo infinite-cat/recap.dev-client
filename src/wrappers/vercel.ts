@@ -9,7 +9,11 @@ import { debugLog } from '../log'
 const newVercelTrace = (request: ClientRequest) => {
   const trace = new Trace(uuidv4(), request.path, 'VERCEL')
 
-  trace.request = { ...request }
+  trace.request = {
+    headers: request.getHeaders(),
+    url: request.path,
+    method: request.method,
+  }
 
   return trace
 }
