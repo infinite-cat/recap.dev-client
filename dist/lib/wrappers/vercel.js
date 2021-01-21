@@ -25,49 +25,55 @@ var newVercelTrace = function (request) {
  */
 exports.wrapVercelHandler = function (func) {
     var wrappedVercelHandler = function (request, response) {
-        var trace = tracer_1.tracer.startNewTrace(newVercelTrace(request));
-        var handlerFunctionEvent = tracer_1.tracer.functionStart('', 'handler');
-        var originalWrite = response.write;
-        var originalEnd = response.end;
-        var resBody = '';
-        // Handling response body
-        response.write = function write() {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
-            }
-            resBody = utils_1.appendBodyChunk(args[0], resBody);
-            return originalWrite.apply(response, args);
-        };
-        response.end = function end() {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
-            }
-            resBody = utils_1.appendBodyChunk(args[0], resBody);
-            originalEnd.apply(response, args);
-        };
-        response.once('finish', function () {
-            try {
-                log_1.debugLog('response body: ', resBody);
-                trace.response = {
-                    headers: response.getHeaders(),
-                    statusCode: response.statusCode,
-                    body: utils_1.safeParse(resBody) || resBody,
-                };
-                tracer_1.tracer.functionEnd(handlerFunctionEvent);
-                trace.end = Date.now();
-                if (response.statusCode >= 500) {
-                    trace.status = 'ERROR';
+        try {
+            var trace_1 = tracer_1.tracer.startNewTrace(newVercelTrace(request));
+            var handlerFunctionEvent_1 = tracer_1.tracer.functionStart('', 'handler');
+            var originalWrite_1 = response.write;
+            var originalEnd_1 = response.end;
+            var resBody_1 = '';
+            // Handling response body
+            response.write = function write() {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
                 }
-            }
-            catch (err) {
-                log_1.debugLog(err);
-                tracer_1.tracer.setTraceError(err);
-            }
-            tracer_1.tracer.sync().then(function () {
+                resBody_1 = utils_1.appendBodyChunk(args[0], resBody_1);
+                return originalWrite_1.apply(response, args);
+            };
+            response.end = function end() {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                resBody_1 = utils_1.appendBodyChunk(args[0], resBody_1);
+                originalEnd_1.apply(response, args);
+            };
+            response.once('finish', function () {
+                try {
+                    log_1.debugLog('response body: ', resBody_1);
+                    trace_1.response = {
+                        headers: response.getHeaders(),
+                        statusCode: response.statusCode,
+                        body: utils_1.safeParse(resBody_1) || resBody_1,
+                    };
+                    tracer_1.tracer.functionEnd(handlerFunctionEvent_1);
+                    trace_1.end = Date.now();
+                    if (response.statusCode >= 500) {
+                        trace_1.status = 'ERROR';
+                    }
+                }
+                catch (err) {
+                    log_1.debugLog(err);
+                    tracer_1.tracer.setTraceError(err);
+                }
+                tracer_1.tracer.sync()
+                    .then(function () {
+                });
             });
-        });
+        }
+        catch (err) {
+            log_1.debugLog(err);
+        }
         func(request, response);
     };
     console_1.captureConsoleLogs();
