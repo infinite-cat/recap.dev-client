@@ -1,4 +1,5 @@
 import { isFunction } from 'lodash-es'
+import { config } from './config'
 
 export const isPromise = (value: any) => (
   value
@@ -12,4 +13,11 @@ export const safeParse = (parseString?: string | null) => {
   } catch (e) {
     return null
   }
+}
+
+export const appendBodyChunk = (chunk, body) => {
+  if (chunk && body.length < config.maxPayloadLength) {
+    return body + chunk
+  }
+  return body
 }

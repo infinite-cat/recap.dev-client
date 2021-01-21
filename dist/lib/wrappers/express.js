@@ -43,6 +43,7 @@ var tracer_1 = require("../tracer");
 var async_hooks_trace_store_1 = require("../services/async-hooks-trace-store");
 var entities_1 = require("../entities");
 var log_1 = require("../log");
+var utils_2 = require("../utils");
 var newExpressTrace = function (req) {
     var trace = new entities_1.Trace(uuid_1.v4(), process.env.RECAP_DEV_APP_NAME || req.hostname, 'EXPRESS_HANDLER');
     trace.request = {
@@ -51,7 +52,6 @@ var newExpressTrace = function (req) {
         method: req.method,
         params: req.params,
         query: req.query,
-        body: req.body,
     };
     trace.start = Date.now();
     return trace;
@@ -120,12 +120,42 @@ function wrapUse(original) {
 }
 var recapExpressMiddleware = function (req, res, next) {
     var originalUrl = url_1.default.parse(req.originalUrl);
+    var originalWrite = res.write;
+    var originalEnd = res.end;
+    var trace;
+    var reqBody = '';
+    var resBody = '';
+    // Handling request body
+    req.on('data', function (chunk) {
+        reqBody = utils_2.appendBodyChunk(chunk, reqBody);
+    });
+    req.on('end', function (chunk) {
+        reqBody = utils_2.appendBodyChunk(chunk, reqBody);
+        trace.request.body = utils_2.safeParse(reqBody) || reqBody;
+        next();
+    });
+    // Handling response body
+    res.write = function write() {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        resBody = utils_2.appendBodyChunk(args[0], resBody);
+        return originalWrite.apply(res, args);
+    };
+    res.end = function end() {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        resBody = utils_2.appendBodyChunk(args[0], resBody);
+        originalEnd.apply(res, args);
+    };
     if (utils_1.isUrlIgnored(originalUrl.path, originalUrl.hostname)) {
         log_1.debugLog("Ignoring request: " + req.method + " " + req.originalUrl);
         next();
         return;
     }
-    var trace;
     try {
         trace = tracer_1.tracer.startNewTrace(newExpressTrace(req));
         var handlerFunctionEvent_1 = tracer_1.tracer.functionStart('', 'handler');
@@ -134,6 +164,7 @@ var recapExpressMiddleware = function (req, res, next) {
                 trace.response = {
                     headers: res.getHeaders(),
                     statusCode: res.statusCode,
+                    body: utils_2.safeParse(resBody) || resBody,
                 };
                 tracer_1.tracer.functionEnd(handlerFunctionEvent_1);
                 trace.end = Date.now();
@@ -152,8 +183,6 @@ var recapExpressMiddleware = function (req, res, next) {
     }
     catch (err) {
         log_1.debugLog(err);
-    }
-    finally {
         next();
     }
 };

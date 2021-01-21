@@ -18375,6 +18375,13 @@
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Config.prototype, "maxPayloadLength", {
+            get: function () {
+                return process.env.RECAP_DEV_MAX_PAYLOAD ? Number(process.env.RECAP_DEV_MAX_PAYLOAD) : 10000;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Config.prototype, "syncEndpoint", {
             get: function () {
                 return process.env.RECAP_DEV_SYNC_ENDPOINT;
@@ -24820,6 +24827,20 @@
     var isPromise = function (value) { return (value
         && isFunction$1(value.then)
         && Object.prototype.toString.call(value) === '[object Promise]'); };
+    var safeParse = function (parseString) {
+        try {
+            return JSON.parse(parseString);
+        }
+        catch (e) {
+            return null;
+        }
+    };
+    var appendBodyChunk = function (chunk$$1, body) {
+        if (chunk$$1 && body.length < config.maxPayloadLength) {
+            return body + chunk$$1;
+        }
+        return body;
+    };
 
     /**
      * Captures following methods of the global console object with recap.dev tracing:
@@ -26233,7 +26254,6 @@
             method: req.method,
             params: req.params,
             query: req.query,
-            body: req.body,
         };
         trace.start = Date.now();
         return trace;
@@ -26302,12 +26322,42 @@
     }
     var recapExpressMiddleware = function (req, res, next) {
         var originalUrl = url.parse(req.originalUrl);
+        var originalWrite = res.write;
+        var originalEnd = res.end;
+        var trace;
+        var reqBody = '';
+        var resBody = '';
+        // Handling request body
+        req.on('data', function (chunk) {
+            reqBody = appendBodyChunk(chunk, reqBody);
+        });
+        req.on('end', function (chunk) {
+            reqBody = appendBodyChunk(chunk, reqBody);
+            trace.request.body = safeParse(reqBody) || reqBody;
+            next();
+        });
+        // Handling response body
+        res.write = function write() {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            resBody = appendBodyChunk(args[0], resBody);
+            return originalWrite.apply(res, args);
+        };
+        res.end = function end() {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            resBody = appendBodyChunk(args[0], resBody);
+            originalEnd.apply(res, args);
+        };
         if (isUrlIgnored(originalUrl.path, originalUrl.hostname)) {
             debugLog("Ignoring request: " + req.method + " " + req.originalUrl);
             next();
             return;
         }
-        var trace;
         try {
             trace = tracer.startNewTrace(newExpressTrace(req));
             var handlerFunctionEvent_1 = tracer.functionStart('', 'handler');
@@ -26316,6 +26366,7 @@
                     trace.response = {
                         headers: res.getHeaders(),
                         statusCode: res.statusCode,
+                        body: safeParse(resBody) || resBody,
                     };
                     tracer.functionEnd(handlerFunctionEvent_1);
                     trace.end = Date.now();
@@ -26334,8 +26385,6 @@
         }
         catch (err) {
             debugLog(err);
-        }
-        finally {
             next();
         }
     };
@@ -26442,11 +26491,32 @@
         var wrappedVercelHandler = function (request, response) {
             var trace = tracer.startNewTrace(newVercelTrace(request));
             var handlerFunctionEvent = tracer.functionStart('', 'handler');
+            var originalWrite = response.write;
+            var originalEnd = response.end;
+            var resBody = '';
+            // Handling response body
+            response.write = function write() {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                resBody = appendBodyChunk(args[0], resBody);
+                return originalWrite.apply(response, args);
+            };
+            response.end = function end() {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                resBody = appendBodyChunk(args[0], resBody);
+                originalEnd.apply(response, args);
+            };
             response.once('finish', function () {
                 try {
                     trace.response = {
                         headers: response.getHeaders(),
                         statusCode: response.statusCode,
+                        body: safeParse(resBody) || resBody,
                     };
                     tracer.functionEnd(handlerFunctionEvent);
                     trace.end = Date.now();

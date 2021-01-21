@@ -5,6 +5,7 @@ var console_1 = require("./console");
 var entities_1 = require("../entities");
 var tracer_1 = require("../tracer");
 var log_1 = require("../log");
+var utils_1 = require("../utils");
 var newVercelTrace = function (request) {
     var trace = new entities_1.Trace(uuid_1.v4(), request.path, 'VERCEL');
     trace.request = {
@@ -26,11 +27,32 @@ exports.wrapVercelHandler = function (func) {
     var wrappedVercelHandler = function (request, response) {
         var trace = tracer_1.tracer.startNewTrace(newVercelTrace(request));
         var handlerFunctionEvent = tracer_1.tracer.functionStart('', 'handler');
+        var originalWrite = response.write;
+        var originalEnd = response.end;
+        var resBody = '';
+        // Handling response body
+        response.write = function write() {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            resBody = utils_1.appendBodyChunk(args[0], resBody);
+            return originalWrite.apply(response, args);
+        };
+        response.end = function end() {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            resBody = utils_1.appendBodyChunk(args[0], resBody);
+            originalEnd.apply(response, args);
+        };
         response.once('finish', function () {
             try {
                 trace.response = {
                     headers: response.getHeaders(),
                     statusCode: response.statusCode,
+                    body: utils_1.safeParse(resBody) || resBody,
                 };
                 tracer_1.tracer.functionEnd(handlerFunctionEvent);
                 trace.end = Date.now();

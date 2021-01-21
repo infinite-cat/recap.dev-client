@@ -17,6 +17,13 @@ var Config = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Config.prototype, "maxPayloadLength", {
+        get: function () {
+            return process.env.RECAP_DEV_MAX_PAYLOAD ? Number(process.env.RECAP_DEV_MAX_PAYLOAD) : 10000;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Config.prototype, "syncEndpoint", {
         get: function () {
             return process.env.RECAP_DEV_SYNC_ENDPOINT;
