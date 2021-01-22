@@ -23,9 +23,13 @@ const newVercelTrace = (request: any, unitName: string) => {
   return trace
 }
 
-const defaultUnitNameStrategy = () => (
-  process.env.VERCEL_ENV + '/api/' + last(callsites()[2]?.getFileName()?.split('/api/'))
-)
+const defaultUnitNameStrategy = () => {
+  console.log(callsites())
+  return (
+    process.env.VERCEL_ENV + '/api/' + last(callsites()[2]?.getFileName()
+      ?.split('/api/'))
+  );
+}
 
 /**
  * Wraps a Vercel handler with recap.dev tracing
