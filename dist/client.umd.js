@@ -26497,7 +26497,6 @@
     };
     var defaultUnitNameStrategy = function () {
         var _a, _b;
-        console.log(callsites_1());
         return (process.env.VERCEL_ENV + '/api/' + last((_b = (_a = callsites_1()[2]) === null || _a === void 0 ? void 0 : _a.getFileName()) === null || _b === void 0 ? void 0 : _b.split('/api/')));
     };
     /**

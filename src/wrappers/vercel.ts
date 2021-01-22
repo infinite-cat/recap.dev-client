@@ -24,7 +24,6 @@ const newVercelTrace = (request: any, unitName: string) => {
 }
 
 const defaultUnitNameStrategy = () => {
-  console.log(callsites())
   return (
     process.env.VERCEL_ENV + '/api/' + last(callsites()[2]?.getFileName()
       ?.split('/api/'))

@@ -25,7 +25,6 @@ var newVercelTrace = function (request, unitName) {
 };
 var defaultUnitNameStrategy = function () {
     var _a, _b;
-    console.log(callsites_1.default());
     return (process.env.VERCEL_ENV + '/api/' + lodash_es_1.last((_b = (_a = callsites_1.default()[2]) === null || _a === void 0 ? void 0 : _a.getFileName()) === null || _b === void 0 ? void 0 : _b.split('/api/')));
 };
 /**
