@@ -37,11 +37,15 @@ export const wrapLambdaHandler = (func: any) => {
 
     const event: any = tracer.functionStart('', context.functionName)
 
-    const timeoutHandler = setTimeout(() => {
-      tracer.functionEnd(event)
+    let timeoutHandler
 
-      tracer.sync()
-    }, context.getRemainingTimeInMillis() - config.serverlessTimeoutWindow)
+    if (context.getRemainingTimeInMillis) {
+      timeoutHandler = setTimeout(() => {
+        tracer.functionEnd(event)
+
+        tracer.sync()
+      }, context.getRemainingTimeInMillis() - config.serverlessTimeoutWindow)
+    }
 
     let result
 

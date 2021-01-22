@@ -8,8 +8,7 @@ import { tracer } from '../tracer'
 import { AsyncHooksTraceStore } from '../services/async-hooks-trace-store'
 import { Trace } from '../entities'
 import { debugLog } from '../log'
-import { safeParse } from '../utils'
-import { config } from '../config'
+import { safeParse, appendBodyChunk } from '../utils'
 
 const newExpressTrace = (req) => {
   const trace = new Trace(uuidv4(), process.env.RECAP_DEV_APP_NAME || req.hostname, 'EXPRESS_HANDLER')
@@ -77,13 +76,6 @@ function wrapUse(original) {
       return argument
     }))
   }
-}
-
-const appendBodyChunk = (chunk, body) => {
-  if (chunk && body.length < config.maxPayloadLength) {
-    return body + chunk
-  }
-  return body
 }
 
 const recapExpressMiddleware = (req, res, next) => {
