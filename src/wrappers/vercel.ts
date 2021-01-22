@@ -1,4 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
+import callsites from 'callsites'
+import { isFunction } from 'lodash-es'
 
 import { captureConsoleLogs } from './console'
 import { Trace } from '../entities'
@@ -6,8 +8,8 @@ import { tracer } from '../tracer'
 import { debugLog } from '../log'
 import { safeParse, appendBodyChunk } from '../utils'
 
-const newVercelTrace = (request: any) => {
-  const trace = new Trace(uuidv4(), request.path, 'VERCEL')
+const newVercelTrace = (request: any, unitName: string) => {
+  const trace = new Trace(uuidv4(), unitName, 'VERCEL')
 
   trace.request = {
     headers: request.rawHeaders,
@@ -21,16 +23,22 @@ const newVercelTrace = (request: any) => {
   return trace
 }
 
+const defaultUnitNameStrategy = () => (
+  process.env.VERCEL_ENV + '/' + callsites()[1].getFileName()
+)
 
 /**
  * Wraps a Vercel handler with recap.dev tracing
  * @param {Function} func - A handler function to wrap
+ * @param {Function | string} [unitName] - Either a unitName string or a function to compute one
  * @returns {Function} Wrapped handler function
  */
-export const wrapVercelHandler = (func) => {
+export const wrapVercelHandler = (func, unitName: (() => string) | string = defaultUnitNameStrategy) => {
   const wrappedVercelHandler = (request, response) => {
     try {
-      const trace = tracer.startNewTrace(newVercelTrace(request))
+      const name = isFunction(unitName) ? unitName() : unitName
+
+      const trace = tracer.startNewTrace(newVercelTrace(request, name))
 
       const handlerFunctionEvent = tracer.functionStart('', 'handler')
 
@@ -48,7 +56,6 @@ export const wrapVercelHandler = (func) => {
         resBody = appendBodyChunk(args[0], resBody)
 
         try {
-          debugLog('response body: ', resBody)
           trace.response = {
             headers: response.getHeaders(),
             statusCode: response.statusCode,
