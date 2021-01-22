@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import callsites from 'callsites'
-import { isFunction, last } from 'lodash-es'
+import { isFunction } from 'lodash-es'
 
 import { captureConsoleLogs } from './console'
 import { Trace } from '../entities'
@@ -9,7 +8,7 @@ import { debugLog } from '../log'
 import { safeParse, appendBodyChunk } from '../utils'
 
 const newVercelTrace = (request: any, unitName: string) => {
-  const trace = new Trace(uuidv4(), unitName, 'VERCEL')
+  const trace = new Trace(uuidv4(), unitName, 'VERCEL_FUNCTION')
 
   trace.request = {
     headers: request.rawHeaders,
@@ -23,9 +22,7 @@ const newVercelTrace = (request: any, unitName: string) => {
   return trace
 }
 
-const defaultUnitNameStrategy = () => {
-  return process.env.VERCEL_ENV as string
-}
+const defaultUnitNameStrategy = () => process.env.VERCEL_ENV as string
 
 /**
  * Wraps a Vercel handler with recap.dev tracing
