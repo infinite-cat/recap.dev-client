@@ -46,10 +46,7 @@ export const wrapVercelHandler = (func) => {
 
       response.end = function end(...args) {
         resBody = appendBodyChunk(args[0], resBody)
-        originalEnd.apply(response, args)
-      }
 
-      response.once('finish', () => {
         try {
           debugLog('response body: ', resBody)
           trace.response = {
@@ -67,10 +64,10 @@ export const wrapVercelHandler = (func) => {
           debugLog(err)
           tracer.setTraceError(err)
         }
-        tracer.sync()
-          .then(() => {
-          })
-      })
+        tracer.sync().then(() => {
+          originalEnd.apply(response, args)
+        })
+      }
     } catch (err) {
       debugLog(err)
     }

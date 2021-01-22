@@ -26510,9 +26510,6 @@
                         args[_i] = arguments[_i];
                     }
                     resBody_1 = appendBodyChunk(args[0], resBody_1);
-                    originalEnd_1.apply(response, args);
-                };
-                response.once('finish', function () {
                     try {
                         debugLog('response body: ', resBody_1);
                         trace_1.response = {
@@ -26530,10 +26527,10 @@
                         debugLog(err);
                         tracer.setTraceError(err);
                     }
-                    tracer.sync()
-                        .then(function () {
+                    tracer.sync().then(function () {
+                        originalEnd_1.apply(response, args);
                     });
-                });
+                };
             }
             catch (err) {
                 debugLog(err);

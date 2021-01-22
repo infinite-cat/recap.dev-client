@@ -46,9 +46,6 @@ exports.wrapVercelHandler = function (func) {
                     args[_i] = arguments[_i];
                 }
                 resBody_1 = utils_1.appendBodyChunk(args[0], resBody_1);
-                originalEnd_1.apply(response, args);
-            };
-            response.once('finish', function () {
                 try {
                     log_1.debugLog('response body: ', resBody_1);
                     trace_1.response = {
@@ -66,10 +63,10 @@ exports.wrapVercelHandler = function (func) {
                     log_1.debugLog(err);
                     tracer_1.tracer.setTraceError(err);
                 }
-                tracer_1.tracer.sync()
-                    .then(function () {
+                tracer_1.tracer.sync().then(function () {
+                    originalEnd_1.apply(response, args);
                 });
-            });
+            };
         }
         catch (err) {
             log_1.debugLog(err);
