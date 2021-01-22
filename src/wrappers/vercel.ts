@@ -24,10 +24,12 @@ const newVercelTrace = (request: any, unitName: string) => {
 }
 
 const defaultUnitNameStrategy = () => {
+  console.log(callsites().map((site) => site.getFileName()))
+
   return (
     process.env.VERCEL_ENV + '/api/' + last(callsites()[2]?.getFileName()
       ?.split('/api/'))
-  );
+  )
 }
 
 /**
