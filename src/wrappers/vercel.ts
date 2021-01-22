@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import callsites from 'callsites'
-import { isFunction } from 'lodash-es'
+import { isFunction, last } from 'lodash-es'
 
 import { captureConsoleLogs } from './console'
 import { Trace } from '../entities'
@@ -24,7 +24,7 @@ const newVercelTrace = (request: any, unitName: string) => {
 }
 
 const defaultUnitNameStrategy = () => (
-  process.env.VERCEL_ENV + '/' + callsites()[1].getFileName()
+  process.env.VERCEL_ENV + '/api/' + last(callsites()[2]?.getFileName()?.split('/api/'))
 )
 
 /**

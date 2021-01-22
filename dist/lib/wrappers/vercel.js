@@ -23,7 +23,10 @@ var newVercelTrace = function (request, unitName) {
     };
     return trace;
 };
-var defaultUnitNameStrategy = function () { return (process.env.VERCEL_ENV + '/' + callsites_1.default()[1].getFileName()); };
+var defaultUnitNameStrategy = function () {
+    var _a, _b;
+    return (process.env.VERCEL_ENV + '/api/' + lodash_es_1.last((_b = (_a = callsites_1.default()[2]) === null || _a === void 0 ? void 0 : _a.getFileName()) === null || _b === void 0 ? void 0 : _b.split('/api/')));
+};
 /**
  * Wraps a Vercel handler with recap.dev tracing
  * @param {Function} func - A handler function to wrap
