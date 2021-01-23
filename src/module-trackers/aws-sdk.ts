@@ -308,8 +308,8 @@ const athenaEventCreator = {
     switch (request.operation) {
       case 'startQueryExecution':
         if (
-          'QueryExecutionContext' in parameters
-          && 'Database' in parameters.QueryExecutionContext
+          'QueryExecutionContext' in parameters &&
+          'Database' in parameters.QueryExecutionContext
         ) {
           event.resourceIdentifier = {
             database: parameters.QueryExecutionContext.Database,
@@ -332,16 +332,17 @@ const athenaEventCreator = {
     switch (response.request.operation) {
       case 'getQueryExecution':
         if (
-          'Status' in response.data.QueryExecution
-          && 'State' in response.data.QueryExecution.Status
+          'Status' in response.data.QueryExecution &&
+          'State' in response.data.QueryExecution.Status
         ) {
           event.response.state = response.data.QueryExecution.Status.State
         }
         if (
-          'ResultConfiguration' in response.data.QueryExecution
-          && 'OutputLocation' in response.data.QueryExecution.Status
+          'ResultConfiguration' in response.data.QueryExecution &&
+          'OutputLocation' in response.data.QueryExecution.Status
         ) {
-          event.response.resultLocation = response.data.QueryExecution.ResultConfiguration.OutputLocation
+          event.response.resultLocation =
+            response.data.QueryExecution.ResultConfiguration.OutputLocation
         }
         event.response.queryId = response.data.QueryExecutionId
         event.response.query = response.data.Query

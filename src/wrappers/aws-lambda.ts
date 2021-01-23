@@ -13,9 +13,8 @@ const newLambdaTrace = (request: any, context: Context) => {
   trace.request = { ...request }
 
   trace.extraData.awsRegion = process.env.AWS_REGION
-  trace.extraData.awsAccountId = context
-    && context.invokedFunctionArn
-    && context.invokedFunctionArn.split(':')[4]
+  trace.extraData.awsAccountId =
+    context && context.invokedFunctionArn && context.invokedFunctionArn.split(':')[4]
   trace.extraData.awsLogStreamName = context && context.logStreamName
 
   return trace

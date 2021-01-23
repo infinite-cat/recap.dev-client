@@ -13,7 +13,9 @@ export const wrapNestJsModule = (module: any) => {
     wrapClass('', injectable.name, injectable, true)
   })
 
-  Reflect.getMetadata('providers', module).forEach((injectable) => wrapClass('', injectable.name, injectable, true))
+  Reflect.getMetadata('providers', module).forEach((injectable) =>
+    wrapClass('', injectable.name, injectable, true),
+  )
 
   return module
 }

@@ -11,7 +11,11 @@ import { debugLog } from '../log'
 import { safeParse, appendBodyChunk } from '../utils'
 
 const newExpressTrace = (req) => {
-  const trace = new Trace(uuidv4(), process.env.RECAP_DEV_APP_NAME || req.hostname, 'EXPRESS_HANDLER')
+  const trace = new Trace(
+    uuidv4(),
+    process.env.RECAP_DEV_APP_NAME || req.hostname,
+    'EXPRESS_HANDLER',
+  )
 
   trace.request = {
     headers: req.headers,
@@ -58,23 +62,29 @@ function wrapMiddleware(middleware) {
 
 function wrapMethod(original) {
   return function internalMethodWrapper(...args) {
-    return original.apply(this, args.map((argument) => {
-      if (argument && typeof argument === 'function') {
-        return wrapMiddleware(argument)
-      }
-      return argument
-    }))
+    return original.apply(
+      this,
+      args.map((argument) => {
+        if (argument && typeof argument === 'function') {
+          return wrapMiddleware(argument)
+        }
+        return argument
+      }),
+    )
   }
 }
 
 function wrapUse(original) {
   return function internalUseWrapper(...args) {
-    return original.apply(this, args.map((argument) => {
-      if (argument && typeof argument === 'function') {
-        return wrapMiddleware(argument)
-      }
-      return argument
-    }))
+    return original.apply(
+      this,
+      args.map((argument) => {
+        if (argument && typeof argument === 'function') {
+          return wrapMiddleware(argument)
+        }
+        return argument
+      }),
+    )
   }
 }
 

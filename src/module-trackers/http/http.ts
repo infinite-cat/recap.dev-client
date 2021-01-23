@@ -31,19 +31,13 @@ function responseOnWrapper(wrappedResFunction, chunks) {
       addChunk(chunk, chunks)
       return resCallback(chunk)
     }
-    return wrappedResFunction.apply(
-      this,
-      [resEvent, resPatchedCallback.bind(this)],
-    )
+    return wrappedResFunction.apply(this, [resEvent, resPatchedCallback.bind(this)])
   }
 }
 
 function requestOnWrapper(wrappedReqFunction, chunks) {
   return function internalRequestOnWrapper(reqEvent, reqCallback) {
-    if (
-      reqEvent !== 'response'
-      || typeof reqCallback !== 'function'
-    ) {
+    if (reqEvent !== 'response' || typeof reqCallback !== 'function') {
       return wrappedReqFunction.apply(this, [reqEvent, reqCallback])
     }
     const reqPatchedCallback = (res) => {
@@ -54,13 +48,9 @@ function requestOnWrapper(wrappedReqFunction, chunks) {
       shimmer.wrap(res, 'on', (wrapped) => responseOnWrapper(wrapped, chunks))
       return reqCallback(res)
     }
-    return wrappedReqFunction.apply(
-      this,
-      [reqEvent, reqPatchedCallback.bind(this)],
-    )
+    return wrappedReqFunction.apply(this, [reqEvent, reqPatchedCallback.bind(this)])
   }
 }
-
 
 function httpWrapper(wrappedFunction) {
   return function internalHttpWrapper(a, b, c) {
@@ -68,13 +58,13 @@ function httpWrapper(wrappedFunction) {
     let options = b
     let callback = c
     const chunks = []
-    if (!(['string', 'URL'].includes(typeof url)) && !callback) {
+    if (!['string', 'URL'].includes(typeof url) && !callback) {
       callback = b
       options = a
       url = undefined
     }
 
-    if ((typeof options === 'function') && (!callback)) {
+    if (typeof options === 'function' && !callback) {
       callback = options
       options = null
     }
@@ -93,30 +83,19 @@ function httpWrapper(wrappedFunction) {
         parsedUrl = urlLib.parse(parsedUrl)
       }
 
-      const hostname = (
-        (parsedUrl && parsedUrl.hostname)
-        || (parsedUrl && parsedUrl.host)
-        || (options && options.hostname)
-        || (options && options.host)
-        || (options && options.uri && options.uri.hostname)
-        || 'localhost'
-      )
+      const hostname =
+        (parsedUrl && parsedUrl.hostname) ||
+        (parsedUrl && parsedUrl.host) ||
+        (options && options.hostname) ||
+        (options && options.host) ||
+        (options && options.uri && options.uri.hostname) ||
+        'localhost'
 
-      const path = (
-        (parsedUrl && parsedUrl.path)
-        || (options && options.path)
-        || ('/')
-      )
+      const path = (parsedUrl && parsedUrl.path) || (options && options.path) || '/'
 
-      const pathname = (
-        (parsedUrl && parsedUrl.pathname)
-        || (options && options.pathname)
-        || ('/')
-      )
+      const pathname = (parsedUrl && parsedUrl.pathname) || (options && options.pathname) || '/'
 
-      const headers = (
-        (options && options.headers) || {}
-      )
+      const headers = (options && options.headers) || {}
 
       if (isUrlIgnored(hostname, path)) {
         debugLog(`filtered blacklist hostname ${hostname}`)
@@ -128,47 +107,51 @@ function httpWrapper(wrappedFunction) {
       // headers['recap-dev-trace-id'] = recapDevTraceId
       //
 
-      const agent = (
+      const agent =
         // eslint-disable-next-line no-underscore-dangle
-        (options && options.agent) || (options && options._defaultAgent)
-        || undefined
-      )
+        (options && options.agent) || (options && options._defaultAgent) || undefined
 
-      const port = (
-        (parsedUrl && parsedUrl.port) || (options && options.port)
-        || (options && options.defaultPort) || (agent && agent.defaultPort) || 80
-      )
+      const port =
+        (parsedUrl && parsedUrl.port) ||
+        (options && options.port) ||
+        (options && options.defaultPort) ||
+        (agent && agent.defaultPort) ||
+        80
 
-      let protocol = (
-        (parsedUrl && parsedUrl.protocol)
-        || (port === 443 && 'https:')
-        || (options && options.protocol)
-        || (agent && agent.protocol)
-        || 'http:'
-      )
+      let protocol =
+        (parsedUrl && parsedUrl.protocol) ||
+        (port === 443 && 'https:') ||
+        (options && options.protocol) ||
+        (agent && agent.protocol) ||
+        'http:'
 
       protocol = protocol.slice(0, -1)
 
-      const body = (
-        options
-        && options.body
-        && (options.body instanceof String || options.body instanceof Buffer)
-      ) ? options.body : ''
+      const body =
+        options &&
+        options.body &&
+        (options.body instanceof String || options.body instanceof Buffer)
+          ? options.body
+          : ''
       const method = (options && options.method) || 'GET'
 
       const requestUrl = `${protocol}://${hostname}${pathname}`
 
-      const event = tracer.resourceAccessStart(hostname, {
-        host: hostname,
-        url: requestUrl,
-      }, {
-        request: {
+      const event = tracer.resourceAccessStart(
+        hostname,
+        {
+          host: hostname,
           url: requestUrl,
-          method,
-          headers,
-          operation: method,
         },
-      })
+        {
+          request: {
+            url: requestUrl,
+            method,
+            headers,
+            operation: method,
+          },
+        },
+      )
 
       if (body) {
         debugLog(`Set request body=${body}`)
@@ -208,25 +191,17 @@ function httpWrapper(wrappedFunction) {
 
       clientRequest = wrappedFunction.apply(this, buildParams(url, options, patchedCallback))
 
-      if (
-        options
-        && options.recapDevSkipResponseData
-        && config.disablePayloadCapture
-      ) {
-        shimmer.wrap(
-          clientRequest,
-          'on',
-          (wrapped) => requestOnWrapper(wrapped, chunks),
-        )
+      if (options && options.recapDevSkipResponseData && config.disablePayloadCapture) {
+        shimmer.wrap(clientRequest, 'on', (wrapped) => requestOnWrapper(wrapped, chunks))
       }
 
-      const WriteWrapper = function (wrappedWriteFunc) {
+      const WriteWrapper = function writeWrapper(wrappedWriteFunc) {
         return function internalWriteWrapper(...args) {
           try {
             if (
-              (!body || body === '') && args[0] && (
-                (typeof args[0] === 'string') || (args[0] instanceof Buffer)
-              )
+              (!body || body === '') &&
+              args[0] &&
+              (typeof args[0] === 'string' || args[0] instanceof Buffer)
             ) {
               event.request.body = decodeJson(body, args[0])
             }
@@ -237,13 +212,13 @@ function httpWrapper(wrappedFunction) {
         }
       }
 
-      const endWrapper = function (wrappedEndFunc) {
+      const endWrapper = function endWrapper(wrappedEndFunc) {
         return function internalEndWrapper(...args) {
           try {
             if (
-              (!body || body === '') && args[0] && (
-                (typeof args[0] === 'string') || (args[0] instanceof Buffer)
-              )
+              (!body || body === '') &&
+              args[0] &&
+              (typeof args[0] === 'string' || args[0] instanceof Buffer)
             ) {
               event.request.body = decodeJson(body, args[0])
             }
@@ -260,7 +235,6 @@ function httpWrapper(wrappedFunction) {
       } catch (err) {
         // In some libs it might not be possible to hook on write
       }
-
 
       let isTimeout = false
       clientRequest.on('timeout', () => {
@@ -290,8 +264,8 @@ function httpWrapper(wrappedFunction) {
 
       clientRequest.on('response', (res) => {
         if (
-          (!options || (options && !options.recapDevSkipResponseData))
-            && !config.disablePayloadCapture
+          (!options || (options && !options.recapDevSkipResponseData)) &&
+          !config.disablePayloadCapture
         ) {
           res.on('data', (chunk) => addChunk(chunk, chunks))
         }
@@ -321,7 +295,6 @@ function httpGetWrapper(module: any) {
     return req
   }
 }
-
 
 function fetchH2Wrapper(wrappedFunc) {
   return function internalFetchH2Wrapper(options) {

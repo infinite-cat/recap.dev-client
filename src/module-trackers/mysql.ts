@@ -17,7 +17,9 @@ function mysqlQueryWrapper(wrappedFunction) {
       params = sql.values
       callback = sql.onResult
     } else {
-      ({ params, callback } = parseQueryArgs(arg1, arg2))
+      const queryArgs = parseQueryArgs(arg1, arg2)
+      params = queryArgs.params
+      callback = queryArgs.callback
     }
 
     // eslint-disable-next-line no-underscore-dangle

@@ -8,14 +8,17 @@ import { debugLog } from '../log'
 import { captureConsoleLogs } from './console'
 
 const newNetlifyTrace = (request: any, context: Context) => {
-  const trace = new Trace(context.awsRequestId, process.env.SITE_NAME! + request.path, 'NETLIFY_FUNCTION')
+  const trace = new Trace(
+    context.awsRequestId,
+    process.env.SITE_NAME! + request.path,
+    'NETLIFY_FUNCTION',
+  )
 
   trace.request = { ...request }
 
   trace.extraData.awsRegion = process.env.AWS_REGION
-  trace.extraData.awsAccountId = context
-    && context.invokedFunctionArn
-    && context.invokedFunctionArn.split(':')[4]
+  trace.extraData.awsAccountId =
+    context && context.invokedFunctionArn && context.invokedFunctionArn.split(':')[4]
   trace.extraData.awsLogStreamName = context && context.logStreamName
 
   return trace

@@ -9,7 +9,8 @@ import { config } from './config'
 
 /**
  * @class
- * @classdesc A recap.dev tracer. Stores traces and provides methods to create, sync and add additional information to them.
+ * @classdesc A recap.dev tracer.
+ * Stores traces and provides methods to create, sync and add additional information to them.
  */
 export class Tracer {
   protected traceStore: TraceStore = new SimpleTraceStore()
@@ -73,11 +74,16 @@ export class Tracer {
   /**
    * Start a new resource access event and add to to the current trace.
    * @param {string} serviceName - Name of the service. E.g. MySQL, ElasticSearch, SQS.
-   * @param {object} resourceIdentifier - Identifier of an individual resource. E.g. an object with a tableName property for databases or a host for HTTP calls.
+   * @param {object} resourceIdentifier - Identifier of an individual resource.
+   * E.g. an object with a tableName property for databases or a host for HTTP calls.
    * @param {object} additionalData - Additional data to add to the event.
    * @return {ResourceAccessEvent} The new event
    */
-  public resourceAccessStart(serviceName: string, resourceIdentifier?: any, additionalData?: any): ResourceAccessEvent {
+  public resourceAccessStart(
+    serviceName: string,
+    resourceIdentifier?: any,
+    additionalData?: any,
+  ): ResourceAccessEvent {
     const timestamp = Date.now()
 
     const event = {

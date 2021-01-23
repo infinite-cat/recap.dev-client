@@ -1,6 +1,10 @@
 class Config {
   get disablePayloadCapture() {
-    return (process.env.RECAP_DEV_DISABLE_PAYLOAD_CAPTURE && Boolean(process.env.RECAP_DEV_DISABLE_PAYLOAD_CAPTURE)) || false
+    return (
+      (process.env.RECAP_DEV_DISABLE_PAYLOAD_CAPTURE &&
+        Boolean(process.env.RECAP_DEV_DISABLE_PAYLOAD_CAPTURE)) ||
+      false
+    )
   }
 
   get syncTimeout() {
@@ -20,7 +24,9 @@ class Config {
   }
 
   get pgDriverModulePath() {
-    return process.env.RECAP_DEV_POSTGRES_MODULE ? `${process.cwd()}${process.env.RECAP_DEV_POSTGRES_MODULE}` : 'pg'
+    return process.env.RECAP_DEV_POSTGRES_MODULE
+      ? `${process.cwd()}${process.env.RECAP_DEV_POSTGRES_MODULE}`
+      : 'pg'
   }
 
   get isDebugLogEnabled() {

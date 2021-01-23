@@ -68,17 +68,21 @@ function onStartHook(event: any) {
       collection = ''
     }
 
-    const mongoDbEvent = tracer.resourceAccessStart('mongodb', {
-      host,
-      port,
-      database: event.databaseName,
-      collection,
-    }, {
-      request: {
-        ...event.command,
-        operation: event.commandName,
+    const mongoDbEvent = tracer.resourceAccessStart(
+      'mongodb',
+      {
+        host,
+        port,
+        database: event.databaseName,
+        collection,
       },
-    })
+      {
+        request: {
+          ...event.command,
+          operation: event.commandName,
+        },
+      },
+    )
 
     eventsMap[event.requestId] = mongoDbEvent
   } catch (error) {

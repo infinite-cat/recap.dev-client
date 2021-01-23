@@ -1,11 +1,8 @@
 import { isFunction } from 'lodash-es'
 import { config } from './config'
 
-export const isPromise = (value: any) => (
-  value
-  && isFunction(value.then)
-  && Object.prototype.toString.call(value) === '[object Promise]'
-)
+export const isPromise = (value: any) =>
+  value && isFunction(value.then) && Object.prototype.toString.call(value) === '[object Promise]'
 
 export const safeParse = (parseString?: string | null) => {
   try {
