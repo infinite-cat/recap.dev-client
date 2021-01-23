@@ -26570,7 +26570,7 @@
                             return [2 /*return*/, func(request, context)];
                         }
                         trace = tracer.startNewTrace(newNetlifyTrace(request, context));
-                        event = tracer.functionStart('', context.functionName);
+                        event = tracer.functionStart('', request.path);
                         if (context.getRemainingTimeInMillis) {
                             timeoutHandler = setTimeout(function () {
                                 tracer.functionEnd(event);

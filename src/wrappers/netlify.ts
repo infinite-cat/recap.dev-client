@@ -35,7 +35,7 @@ export const wrapNetlifyHandler = (func: any) => {
 
     const trace = tracer.startNewTrace(newNetlifyTrace(request, context))
 
-    const event: any = tracer.functionStart('', context.functionName)
+    const event: any = tracer.functionStart('', request.path)
 
     let timeoutHandler
 

@@ -79,7 +79,7 @@ exports.wrapNetlifyHandler = function (func) {
                         return [2 /*return*/, func(request, context)];
                     }
                     trace = tracer_1.tracer.startNewTrace(newNetlifyTrace(request, context));
-                    event = tracer_1.tracer.functionStart('', context.functionName);
+                    event = tracer_1.tracer.functionStart('', request.path);
                     if (context.getRemainingTimeInMillis) {
                         timeoutHandler = setTimeout(function () {
                             tracer_1.tracer.functionEnd(event);
