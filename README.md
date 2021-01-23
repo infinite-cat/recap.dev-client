@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://recap.dev" target="_blank" align="center">
-    <img src="https://raw.githubusercontent.com/infinite-cat/recap.dev-server/master/logo.svg" width="300">
+    <img src=".github/assets/logo.svg" width="300">
   </a>
   <br />
 </p>
