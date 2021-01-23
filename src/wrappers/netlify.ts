@@ -7,8 +7,12 @@ import { isPromise } from '../utils'
 import { debugLog } from '../log'
 import { captureConsoleLogs } from './console'
 
-const newLambdaTrace = (request: any, context: Context) => {
-  const trace = new Trace(context.awsRequestId, context.functionName, 'AWS_LAMBDA')
+const newNetlifyTrace = (request: any, context: Context) => {
+  const trace = new Trace(
+    context.awsRequestId,
+    process.env.SITE_NAME! + request.path,
+    'NETLIFY_FUNCTION',
+  )
 
   trace.request = { ...request }
 
@@ -21,10 +25,10 @@ const newLambdaTrace = (request: any, context: Context) => {
 }
 
 /**
- * Wraps lambda handler with recap.dev tracing
+ * Wraps Netlify handler with recap.dev tracing
  * @param {function} func - The request handler function.
  */
-export const wrapLambdaHandler = (func: any) => {
+export const wrapNetlifyHandler = (func: any) => {
   captureConsoleLogs()
   const wrappedLambdaHandler: any = async (request: any, context: Context) => {
     if (!context) {
@@ -32,9 +36,9 @@ export const wrapLambdaHandler = (func: any) => {
       return func(request, context)
     }
 
-    const trace = tracer.startNewTrace(newLambdaTrace(request, context))
+    const trace = tracer.startNewTrace(newNetlifyTrace(request, context))
 
-    const event: any = tracer.functionStart('', context.functionName)
+    const event: any = tracer.functionStart('', request.path)
 
     let timeoutHandler
 

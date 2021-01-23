@@ -12,13 +12,17 @@ import { tracer } from '../tracer'
  */
 export const captureConsoleLogs = () => {
   const consoleLogWrapper = (original) => (...args) => {
-    tracer.addLogEntry(args.map((arg) => {
-      if (isObject(arg)) {
-        return JSON.stringify(arg)
-      }
+    tracer.addLogEntry(
+      args
+        .map((arg) => {
+          if (isObject(arg)) {
+            return JSON.stringify(arg)
+          }
 
-      return arg
-    }).join())
+          return arg
+        })
+        .join(),
+    )
 
     return original(...args)
   }

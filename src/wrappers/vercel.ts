@@ -30,7 +30,10 @@ const defaultUnitNameStrategy = () => process.env.VERCEL_ENV as string
  * @param {Function | string} [unitName] - Either a unitName string or a function to compute one
  * @returns {Function} Wrapped handler function
  */
-export const wrapVercelHandler = (func, unitName: (() => string) | string = defaultUnitNameStrategy) => {
+export const wrapVercelHandler = (
+  func,
+  unitName: (() => string) | string = defaultUnitNameStrategy,
+) => {
   const wrappedVercelHandler = (request, response) => {
     try {
       const name = isFunction(unitName) ? unitName() : unitName

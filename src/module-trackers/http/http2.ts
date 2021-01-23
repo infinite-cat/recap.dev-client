@@ -8,13 +8,14 @@ import { tracer } from '../../tracer'
 
 const http2 = tryRequire('http2')
 
-const extractHeaders = (headers) => Object.entries(headers)
-  .filter((header) => !header[0].startsWith(':'))
-  .reduce((obj, header) => {
-    const [key, value] = header
-    obj[key] = value
-    return obj
-  }, {})
+const extractHeaders = (headers) =>
+  Object.entries(headers)
+    .filter((header) => !header[0].startsWith(':'))
+    .reduce((obj, header) => {
+      const [key, value] = header
+      obj[key] = value
+      return obj
+    }, {})
 
 function httpWrapper(wrappedFunction, authority) {
   return function internalHttpWrapper(headers, options) {
@@ -35,17 +36,21 @@ function httpWrapper(wrappedFunction, authority) {
       // headers['recap-dev-trace-id'] = recapDevTraceId
       //
 
-      event = tracer.resourceAccessStart(hostname!, {
-        host: hostname,
-        url: authority,
-      }, {
-        request: {
+      event = tracer.resourceAccessStart(
+        hostname!,
+        {
+          host: hostname,
           url: authority,
-          method: headers[':method'],
-          headers: reqHeaders,
-          operation: headers[':method'],
         },
-      })
+        {
+          request: {
+            url: authority,
+            method: headers[':method'],
+            headers: reqHeaders,
+            operation: headers[':method'],
+          },
+        },
+      )
     } catch (error) {
       debugLog(error)
       return wrappedFunction.apply(this, [headers, options])
@@ -83,7 +88,10 @@ function httpWrapper(wrappedFunction, authority) {
         event.end = Date.now()
 
         if (!config.disablePayloadCapture) {
-          event.response.body = decodeJson(Buffer.concat(chunks), responseHeaders['content-encoding'])
+          event.response.body = decodeJson(
+            Buffer.concat(chunks),
+            responseHeaders['content-encoding'],
+          )
         }
       })
 
@@ -119,7 +127,9 @@ function wrapHttp2Connect(connectFunction) {
   return function innerWrapHttp2Connect(authority, options, listener) {
     const clientSession = connectFunction.apply(this, [authority, options, listener])
     try {
-      shimmer.wrap(clientSession, 'request', (wrappedFunction) => httpWrapper(wrappedFunction, authority))
+      shimmer.wrap(clientSession, 'request', (wrappedFunction) =>
+        httpWrapper(wrappedFunction, authority),
+      )
     } catch (err) {
       debugLog(`Could not instrument http2 session request ${err}`)
     }

@@ -27,15 +27,19 @@ const logError = (err, event) => {
 function elasticSearchWrapper(wrappedFunction) {
   function internalEsClientWrapper(params, options, callback) {
     if (callback) {
-      const event = tracer.resourceAccessStart('elasticsearch', { path: params.path }, {
-        request: {
-          method: params.method,
-          body: params.body,
-          bulkBody: params.bulkBody,
-          queryString: params.querystring,
-          operation: params.method,
+      const event = tracer.resourceAccessStart(
+        'elasticsearch',
+        { path: params.path },
+        {
+          request: {
+            method: params.method,
+            body: params.body,
+            bulkBody: params.bulkBody,
+            queryString: params.querystring,
+            operation: params.method,
+          },
         },
-      })
+      )
 
       const patchedCallback = (err, result) => {
         if (err) {

@@ -13,7 +13,11 @@ export class SimpleTraceStore implements TraceStore {
     return this.currentTrace
   }
 
+  // eslint-disable-next-line no-unused-vars
   associateAsyncId(_: number) {
-    throw new Error('Current trace store doesn\t support async hooks. Try setting a supported trace store, for example tracer.setTraceStore(new AsyncHooksTraceStore())')
+    throw new Error(
+      // eslint-disable-next-line max-len
+      'Current trace store doesn\t support async hooks. Try setting a supported trace store, for example tracer.setTraceStore(new AsyncHooksTraceStore())',
+    )
   }
 }
