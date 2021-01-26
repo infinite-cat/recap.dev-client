@@ -1,3 +1,5 @@
+import jsonStringify from 'json-stringify-safe'
+
 import { patchModule, serializeError } from './utils'
 import { getSNSTrigger } from './sqs-sns-trigger.utils'
 import { debugLog } from '../log'
@@ -461,7 +463,7 @@ function AWSSDKWrapper(wrappedFunction) {
             }
 
             if (response.error !== null) {
-              event.error = JSON.stringify(response.error)
+              event.error = jsonStringify(response.error)
               event.status = 'ERROR'
             }
           } catch (e) {

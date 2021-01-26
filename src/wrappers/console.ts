@@ -1,4 +1,5 @@
 import shimmer from 'shimmer'
+import jsonStringify from 'json-stringify-safe'
 import { isObject } from 'lodash-es'
 import { tracer } from '../tracer'
 
@@ -16,7 +17,7 @@ export const captureConsoleLogs = () => {
       args
         .map((arg) => {
           if (isObject(arg)) {
-            return JSON.stringify(arg)
+            return jsonStringify(arg)
           }
 
           return arg

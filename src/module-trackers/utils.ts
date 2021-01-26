@@ -1,6 +1,7 @@
 /* eslint-disable camelcase,no-undef,import/no-extraneous-dependencies,global-require */
 import shimmer from 'shimmer'
 import { serializeError as errorToObject } from 'serialize-error'
+import jsonStringify from 'json-stringify-safe'
 
 let lastError: null | Error = null
 
@@ -93,5 +94,5 @@ export const serializeError = (err?: Error) => {
     return undefined
   }
 
-  return JSON.stringify(errorToObject(err))
+  return jsonStringify(errorToObject(err))
 }
