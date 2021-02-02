@@ -22,6 +22,8 @@
         "argsIgnorePattern": "^_"
       }
     ],
+    "no-unused-expressions": "off",
+    "@typescript-eslint/no-unused-expressions": "error",
     "class-methods-use-this": "off",
     "import/extensions": "off"
   }
