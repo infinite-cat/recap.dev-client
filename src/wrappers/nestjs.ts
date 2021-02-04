@@ -1,6 +1,29 @@
 import 'reflect-metadata'
+import { isString, isFunction } from 'lodash-es'
 
 import { wrapClass } from './common'
+
+const isCustomProvider = (provider) => provider && Boolean(provider.provide)
+
+const wrapInjectable = (injectable) => {
+  if (!isCustomProvider(injectable)) {
+    wrapClass('', injectable.name, injectable, true)
+  }
+
+  if (injectable && injectable.useClass) {
+    let name = injectable.useClass.name
+
+    if (isString(injectable.provide)) {
+      name = injectable.provide
+    }
+
+    if (isFunction(injectable.provide)) {
+      name = injectable.provide.name
+    }
+
+    wrapClass('', name, injectable.useClass, true)
+  }
+}
 
 /**
  * Wraps a NestJS module with recap.dev tracing
@@ -10,11 +33,11 @@ import { wrapClass } from './common'
  */
 export const wrapNestJsModule = (module: any) => {
   Reflect.getMetadata('controllers', module)?.forEach((injectable) => {
-    wrapClass('', injectable.name, injectable, true)
+    wrapInjectable(injectable)
   })
 
   Reflect.getMetadata('providers', module)?.forEach((injectable) =>
-    wrapClass('', injectable.name, injectable, true)
+    wrapInjectable(injectable)
   )
 
   return module
