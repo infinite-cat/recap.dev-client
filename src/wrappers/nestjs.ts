@@ -3,7 +3,7 @@ import { isString, isFunction } from 'lodash-es'
 
 import { wrapClass } from './common'
 
-const isCustomProvider = (provider) => provider && (provider.provide as boolean)
+const isCustomProvider = (provider) => provider && Boolean(provider.provide)
 
 const wrapInjectable = (injectable) => {
   if (!isCustomProvider(injectable)) {
