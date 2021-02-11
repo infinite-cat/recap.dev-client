@@ -4,6 +4,7 @@ import { patchModule, serializeError } from './utils'
 import { getSNSTrigger } from './sqs-sns-trigger.utils'
 import { debugLog } from '../log'
 import { tracer } from '../tracer'
+import { safeParse } from '../utils';
 
 const s3EventCreator = {
   requestHandler(request: any, event: any) {
@@ -200,7 +201,9 @@ const lambdaEventCreator = {
     event.request.payload = parameters.Payload
   },
 
-  responseHandler() {},
+  responseHandler(response, event) {
+    event.response.payload = safeParse(response?.Payload) || response?.Payload?.toString()
+  },
 }
 
 const dynamoDBEventCreator = {
