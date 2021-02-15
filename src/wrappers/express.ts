@@ -152,6 +152,7 @@ const createRecapExpressMiddleware = (options?: ExpressWrapperOptions) => (req, 
 }
 
 function createExpressWrapper(options?: ExpressWrapperOptions) {
+  // eslint-disable-next-line func-names
   return function (wrappedFunction) {
     tracer.setTraceStore(new AsyncHooksTraceStore())
 
