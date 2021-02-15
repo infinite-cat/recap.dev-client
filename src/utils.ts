@@ -1,4 +1,6 @@
 import { isFunction, isNull, isUndefined, isString } from 'lodash-es'
+import jsonStringify from 'json-stringify-safe'
+
 import { config } from './config'
 
 export const isPromise = (value: any) =>
@@ -31,7 +33,7 @@ export const limitPayload = (
     return `${payload.substr(0, limit - 3)}...`
   }
 
-  const stringifiedPayload = JSON.stringify(payload)
+  const stringifiedPayload = jsonStringify(payload)
 
   if (stringifiedPayload.length > limit) {
     return `${stringifiedPayload.substr(0, limit - 3)}...`
