@@ -8,7 +8,7 @@ import { tracer } from '../tracer'
 import { AsyncHooksTraceStore } from '../services/async-hooks-trace-store'
 import { Trace } from '../entities'
 import { debugLog } from '../log'
-import { safeParse, appendBodyChunk } from '../utils'
+import { safeParse, appendBodyChunk, limitPayload } from '../utils'
 
 const newExpressTrace = (req) => {
   const trace = new Trace(
@@ -88,50 +88,43 @@ function wrapUse(original) {
   }
 }
 
-const recapExpressMiddleware = (req, res, next) => {
-  const originalUrl = urlLib.parse(req.originalUrl)
-  const originalWrite = res.write
-  const originalEnd = res.end
-
-  let trace: Trace
-  let reqBody = ''
-  let resBody = ''
-
-  // Handling request body
-  req.on('data', (chunk) => {
-    reqBody = appendBodyChunk(chunk, reqBody)
-  })
-
-  req.on('end', (chunk) => {
-    reqBody = appendBodyChunk(chunk, reqBody)
-    trace.request.body = safeParse(reqBody) || reqBody
-    next()
-  })
-
-  // Handling response body
-  res.write = function write(...args) {
-    resBody = appendBodyChunk(args[0], resBody)
-    return originalWrite.apply(res, args)
-  }
-
-  res.end = function end(...args) {
-    resBody = appendBodyChunk(args[0], resBody)
-    originalEnd.apply(res, args)
-  }
-
-  if (isUrlIgnored(originalUrl.path, originalUrl.hostname)) {
-    debugLog(`Ignoring request: ${req.method} ${req.originalUrl}`)
-    next()
-    return
-  }
-
+const createRecapExpressMiddleware = (options?: ExpressWrapperOptions) => (req, res, next) => {
   try {
-    trace = tracer.startNewTrace(newExpressTrace(req))
+    if (options?.filterRequest && !options.filterRequest(req)) {
+      return
+    }
+
+    const originalUrl = urlLib.parse(req.originalUrl)
+
+    if (isUrlIgnored(originalUrl.path, originalUrl.hostname)) {
+      debugLog(`Ignoring request: ${req.method} ${req.originalUrl}`)
+      return
+    }
+
+    const originalWrite = res.write
+    const originalEnd = res.end
+
+    let resBody = ''
+
+    // Handling response body
+    res.write = function write(...args) {
+      resBody = appendBodyChunk(args[0], resBody)
+      return originalWrite.apply(res, args)
+    }
+
+    res.end = function end(...args) {
+      resBody = appendBodyChunk(args[0], resBody)
+      originalEnd.apply(res, args)
+    }
+
+    const trace = tracer.startNewTrace(newExpressTrace(req))
 
     const handlerFunctionEvent = tracer.functionStart('', 'handler')
 
     res.once('finish', () => {
       try {
+        trace.request.body = limitPayload(req.body || req.rawBody)
+
         trace.response = {
           headers: res.getHeaders(),
           statusCode: res.statusCode,
@@ -153,17 +146,21 @@ const recapExpressMiddleware = (req, res, next) => {
     })
   } catch (err) {
     debugLog(err)
+  } finally {
     next()
   }
 }
 
-function wrapExpress(wrappedFunction) {
-  tracer.setTraceStore(new AsyncHooksTraceStore())
+function createExpressWrapper(options?: ExpressWrapperOptions) {
+  // eslint-disable-next-line func-names
+  return function (wrappedFunction) {
+    tracer.setTraceStore(new AsyncHooksTraceStore())
 
-  return function internalExpressWrapper(...args) {
-    const result = wrappedFunction.apply(this, ...args)
-    this.use(recapExpressMiddleware)
-    return result
+    return function internalExpressWrapper(...args) {
+      const result = wrappedFunction.apply(this, ...args)
+      this.use(createRecapExpressMiddleware(options))
+      return result
+    }
   }
 }
 
@@ -196,17 +193,34 @@ const methods = [
   'connect',
 ]
 
+interface ExpressWrapperOptions {
+  /**
+   * Allows filtering requests, for example to ignore requests to static assets
+   * @param {ClientRequest} request - Request to filter
+   * @return {boolean} - true to trace the request or false to ignore it
+   * @example
+   * import express from 'express'
+   * import { traceExpress } from '@recap.dev/client'
+   * traceExpress(express, {
+   *   filterRequest: (request) => request.originalUrl.startsWith('/api/')
+   * });
+   * const tracedApp = express()
+   */
+  filterRequest?: (request) => boolean
+}
+
 /**
  * Wraps express with recap.dev tracing.
  * @param {function} express - Express module to wrap.
+ * @param {ExpressWrapperOptions} options - Additional options
  * @example
  * import express from 'express'
  * import { traceExpress } from '@recap.dev/client'
  * traceExpress(express)
  * const tracedApp = express()
  */
-export const traceExpress = (express) => {
-  shimmer.wrap(express.application, 'init', wrapExpress)
+export const traceExpress = (express, options?: ExpressWrapperOptions) => {
+  shimmer.wrap(express.application, 'init', createExpressWrapper(options))
 
   shimmer.wrap(express.Router, 'use', wrapUse)
 
