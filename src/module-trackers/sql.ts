@@ -1,13 +1,13 @@
 import { isArray, isEmpty, get } from 'lodash-es'
 
+import { debugLog } from '../log'
+import { serializeError } from './utils'
+import { tracer } from '../tracer'
+
 // @ts-ignore
 const mysqlParser = require('node-sql-parser/build/mysql')
 // @ts-ignore
 const postgresParser = require('node-sql-parser/build/postgresql')
-
-import { debugLog } from '../log'
-import { serializeError } from './utils'
-import { tracer } from '../tracer'
 
 const MAX_QUERY_SIZE = 2048
 const MAX_PARAMS_LENGTH = 5
