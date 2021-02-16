@@ -4,9 +4,7 @@ import { debugLog } from '../log'
 import { serializeError } from './utils'
 import { tracer } from '../tracer'
 
-// @ts-ignore
 const mysqlParser = require('node-sql-parser/build/mysql')
-// @ts-ignore
 const postgresParser = require('node-sql-parser/build/postgresql')
 
 const MAX_QUERY_SIZE = 2048
@@ -27,8 +25,6 @@ export const parseQueryArgs = function parseQueryArgs(arg1, arg2) {
 
 export const extractSqlInformation = (query: string, driver: string) => {
   try {
-
-
     const parser = new parsers[driver].Parser()
     const { tableList } = parser.parse(query, { database: driver })
     if (!isEmpty(tableList)) {
