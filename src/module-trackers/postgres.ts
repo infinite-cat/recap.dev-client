@@ -27,7 +27,7 @@ function pgClientWrapper(wrappedFunction) {
       sqlParams,
       callback,
       this.connectionParameters || this._clients[0], // eslint-disable-line
-      'PostgreSQL',
+      'PostgresQL',
     )
 
     if (callback) {

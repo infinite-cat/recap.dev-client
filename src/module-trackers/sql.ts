@@ -1,12 +1,19 @@
 import { isArray, isEmpty, get } from 'lodash-es'
-import sqlParser from 'node-sql-parser'
 
 import { debugLog } from '../log'
 import { serializeError } from './utils'
 import { tracer } from '../tracer'
 
+const mysqlParser = require('node-sql-parser/build/mysql')
+const postgresParser = require('node-sql-parser/build/postgresql')
+
 const MAX_QUERY_SIZE = 2048
 const MAX_PARAMS_LENGTH = 5
+
+const parsers = {
+  'MySQL': mysqlParser,
+  'PostgresQL': postgresParser,
+}
 
 export const parseQueryArgs = function parseQueryArgs(arg1, arg2) {
   const paramNotSet = arg2 === undefined && arg1 instanceof Function
@@ -18,7 +25,7 @@ export const parseQueryArgs = function parseQueryArgs(arg1, arg2) {
 
 export const extractSqlInformation = (query: string, driver: string) => {
   try {
-    const parser = new sqlParser.Parser()
+    const parser = new parsers[driver].Parser()
     const { tableList } = parser.parse(query, { database: driver })
     if (!isEmpty(tableList)) {
       const [operation, dbName, tableName] = tableList[0].split('::')
