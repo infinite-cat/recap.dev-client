@@ -19,6 +19,8 @@ export class Trace {
 
   error?: string
 
+  ignore?: boolean
+
   logs: LogEntry[] = []
 
   appName = process.env.RECAP_DEV_APP_NAME
