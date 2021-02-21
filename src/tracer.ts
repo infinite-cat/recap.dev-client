@@ -168,7 +168,7 @@ export class Tracer {
 
       const traceToSync = this.traceStore.getCurrentTrace()
 
-      if (!traceToSync) {
+      if (!traceToSync || traceToSync.ignore) {
         return
       }
 
