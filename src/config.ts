@@ -7,6 +7,22 @@ class Config {
     )
   }
 
+  get disableResourceCapture() {
+    return (
+      (process.env.RECAP_DEV_DISABLE_RESOURCE_CAPTURE &&
+        Boolean(process.env.RECAP_DEV_DISABLE_RESOURCE_CAPTURE)) ||
+      false
+    )
+  }
+
+  get disableFunctionCallsCapture() {
+    return (
+      (process.env.RECAP_DEV_DISABLE_FUNCTION_CAPTURE &&
+        Boolean(process.env.RECAP_DEV_DISABLE_FUNCTION_CAPTURE)) ||
+      false
+    )
+  }
+
   get syncTimeout() {
     return process.env.RECAP_DEV_SYNC_TIMEOUT ? Number(process.env.RECAP_DEV_SYNC_TIMEOUT) : 1000
   }

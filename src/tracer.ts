@@ -56,7 +56,7 @@ export class Tracer {
 
     const trace = this.traceStore.getCurrentTrace()
 
-    if (trace) {
+    if (trace && !config.disableFunctionCallsCapture) {
       trace.functionCallEvents.push(event)
     }
 
