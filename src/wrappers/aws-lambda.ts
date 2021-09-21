@@ -3,7 +3,7 @@ import { Context } from 'aws-lambda'
 import { config } from '../config'
 import { tracer } from '../tracer'
 import { Trace } from '../entities'
-import { isPromise } from '../utils'
+import { isPromise, limitPayload } from '../utils'
 import { debugLog } from '../log'
 import { captureConsoleLogs } from './console'
 
@@ -63,7 +63,7 @@ export const wrapLambdaHandler = (func: any) => {
         .then((resolvedResult: any) => {
           tracer.functionEnd(event)
 
-          trace.response = { ...resolvedResult }
+          trace.response = limitPayload(resolvedResult)
 
           clearTimeout(timeoutHandler)
 
@@ -81,7 +81,7 @@ export const wrapLambdaHandler = (func: any) => {
         })
     }
 
-    trace.response = { ...result }
+    trace.response = limitPayload(result)
     tracer.functionEnd(event)
 
     clearTimeout(timeoutHandler)
