@@ -4,6 +4,7 @@ import sourceMaps from 'rollup-plugin-sourcemaps'
 import camelCase from 'lodash.camelcase'
 import typescript from 'rollup-plugin-typescript2'
 import json from 'rollup-plugin-json'
+import { uglify } from 'rollup-plugin-uglify'
 
 const pkg = require('./package.json')
 
@@ -28,5 +29,6 @@ export default {
     resolve(),
     commonjs(),
     sourceMaps(),
+    uglify(),
   ],
 }
