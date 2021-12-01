@@ -23,6 +23,11 @@ export const tryRequire: any = (id: string) => {
       return require('mysql/lib/Connection.js')
     }
 
+    if (id === 'mysql2') {
+      // @ts-ignore
+      return require('mysql2')
+    }
+
     if (id === '@elastic/elasticsearch') {
       // @ts-ignore
       return require('@elastic/elasticsearch')

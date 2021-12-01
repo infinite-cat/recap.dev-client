@@ -16,7 +16,7 @@ export default {
     { file: pkg.module, format: 'es', sourcemap: true },
   ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
-  external: ['mysql', 'pg', 'pg-pool', '@elastic/elasticsearch', 'mongodb'],
+  external: ['mysql', 'mysql2', 'pg', 'pg-pool', '@elastic/elasticsearch', 'mongodb'],
   watch: {
     include: 'src/**',
   },
