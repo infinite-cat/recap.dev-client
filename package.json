@@ -29,7 +29,7 @@
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "travis-deploy-once": "travis-deploy-once"
   },
-  "dependencies": {
+  "devDependencies": {
     "json-stringify-safe": "^5.0.1",
     "lodash-es": "^4.17.21",
     "node-fetch": "^2.6.0",
@@ -38,9 +38,7 @@
     "require-in-the-middle": "^5.1.0",
     "serialize-error": "^6.0.0",
     "shimmer": "^1.2.1",
-    "uuid": "^8.3.0"
-  },
-  "devDependencies": {
+    "uuid": "^8.3.0",
     "@elastic/elasticsearch": "^7.4.0",
     "@types/aws-lambda": "^8.10.48",
     "@types/jest": "^23.3.2",
