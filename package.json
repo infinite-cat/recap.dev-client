@@ -73,6 +73,7 @@
     "mongodb": "^3.6.3",
     "mysql": "^2.18.1",
     "pg": "^8.0.3",
+    "mysql2": "^2.3.3",
     "prettier": "^2.2.1",
     "prompt": "^1.0.0",
     "replace-in-file": "^3.4.2",
