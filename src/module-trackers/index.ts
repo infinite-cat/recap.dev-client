@@ -8,15 +8,21 @@ import { trackMongoDb } from './mongodb'
 import { config } from '../config'
 
 export const trackModules = () => {
-  if (config.disableResourceCapture) {
-    return
-  }
+  try {
+    if (config.disableResourceCapture) {
+      return
+    }
 
-  awsSdkTracker.init()
-  trackMysql()
-  trackPostgres()
-  trackMongoDb()
-  trackElasticsearch()
-  trackHttp()
-  trackHttp2()
+    awsSdkTracker.init()
+    trackMysql()
+    trackPostgres()
+    trackMongoDb()
+    trackElasticsearch()
+    trackHttp()
+    trackHttp2()
+  } catch (e) {
+    if (config.isDebugLogEnabled) {
+      console.log('Error setting up recap.dev tracing: ', e)
+    }
+  }
 }
