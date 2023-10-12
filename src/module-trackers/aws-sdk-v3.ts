@@ -229,6 +229,7 @@ function getOperationByCommand(command) {
 function AWSSDKv3Wrapper(wrappedFunction) {
   console.log('wrapping function', wrappedFunction)
   return function internalAWSSDKv3Wrapper(command) {
+    console.log('wrapped command: ', command)
     let responsePromise = wrappedFunction.apply(this, [command]);
     try {
       const serviceIdentifier = this.config.serviceId.toLowerCase();
