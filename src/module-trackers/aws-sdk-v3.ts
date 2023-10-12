@@ -247,7 +247,6 @@ function AWSSDKv3Wrapper(wrappedFunction) {
   return function internalAWSSDKv3Wrapper(command) {
     let responsePromise = wrappedFunction.apply(this, [command]);
     try {
-      console.log(this, this.config, this.config.serviceId)
       const serviceIdentifier = this.config.serviceId.toLowerCase();
 
       if (!serviceIdentifier) {
