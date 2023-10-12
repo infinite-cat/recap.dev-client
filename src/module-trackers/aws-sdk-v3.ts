@@ -205,7 +205,7 @@ const lambdaEventCreator = {
     event.resourceIdentifier = {
       functionName: parameters.FunctionName,
     }
-    event.request.payload = parameters.Payload
+    event.request.payload = safeParse(new TextDecoder().decode(parameters.Payload)) || new TextDecoder().decode(parameters.Payload)
   },
 
   responseHandler(response, event) {
