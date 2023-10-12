@@ -208,6 +208,11 @@ const lambdaEventCreator = {
   },
 
   responseHandler(operation, response, event) {
+    if (response.FunctionError) {
+      event.response.error = response.FunctionError
+      event.status = 'ERROR'
+    }
+
     event.response.payload = safeParse(new TextDecoder().decode(response?.Payload)) || new TextDecoder().decode(response?.Payload)
   },
 }
