@@ -1,10 +1,11 @@
-import jsonStringify from 'json-stringify-safe'
+import Hook from 'require-in-the-middle'
 
 import { patchModule, serializeError } from './utils'
 import { debugLog } from '../log'
 import { tracer } from '../tracer'
 import { ResourceAccessEvent } from '../entities'
 import { getSNSTrigger } from './sqs-sns-trigger.utils'
+import { safeParse } from '../utils'
 
 const SNSv3EventCreator = {
   requestHandler(operation, command, event: ResourceAccessEvent) {
@@ -196,6 +197,26 @@ const DynamoDBv3EventCreator = {
   },
 };
 
+const lambdaEventCreator = {
+  requestHandler(operation, command, event) {
+    const parameters = command.input || {}
+
+    event.resourceIdentifier = {
+      functionName: parameters.FunctionName,
+    }
+    event.request.payload = safeParse(new TextDecoder().decode(parameters.Payload)) || new TextDecoder().decode(parameters.Payload)
+  },
+
+  responseHandler(operation, response, event) {
+    if (response.FunctionError) {
+      event.response.error = response.FunctionError
+      event.status = 'ERROR'
+    }
+
+    event.response.payload = safeParse(new TextDecoder().decode(response?.Payload)) || new TextDecoder().decode(response?.Payload)
+  },
+}
+
 /**
  * a map between AWS resource names and their appropriate creator object.
  */
@@ -203,6 +224,7 @@ const specificEventCreators = {
   sns: SNSv3EventCreator,
   dynamodb: DynamoDBv3EventCreator,
   sqs: SQSv3EventCreator,
+  lambda: lambdaEventCreator,
 };
 
 /**
@@ -231,7 +253,7 @@ function AWSSDKv3Wrapper(wrappedFunction) {
     try {
       const serviceIdentifier = this.config.serviceId.toLowerCase();
 
-      if (!(serviceIdentifier in specificEventCreators)) {
+      if (!serviceIdentifier) {
         // resource is not supported yet
         return responsePromise;
       }
@@ -254,17 +276,7 @@ function AWSSDKv3Wrapper(wrappedFunction) {
           event.status = 'OK'
           event.request.requestId = response.requestId
 
-          if (response.data) {
-            event.response.statusCode = response.httpResponse.statusCode
-            event.status = 'OK'
-
-            specificEventCreators[serviceIdentifier].responseHandler(response, event)
-          }
-
-          if (response.error !== null) {
-            event.error = jsonStringify(response.error)
-            event.status = 'ERROR'
-          }
+          specificEventCreators[serviceIdentifier].responseHandler(operation, response, event)
         } catch (e) {
           debugLog(e)
         }
@@ -290,6 +302,14 @@ export default {
    * Initializes the @aws-sdk tracer
    */
   init() {
+    Hook(
+      ['@smithy/smithy-client'],
+      (AWSmod) => {
+        AWSmod.Client.prototype.send = AWSSDKv3Wrapper(AWSmod.Client.prototype.send)
+        return AWSmod
+      },
+    );
+
     patchModule(
       '@aws-sdk/client-dynamodb',
       'send',
@@ -315,7 +335,7 @@ export default {
       (AWSmod) => AWSmod.SESClient.prototype
     );
     patchModule(
-      '@aws-sdk/smithy-client',
+      '@smithy/smithy-client',
       'send',
       AWSSDKv3Wrapper,
       (AWSmod) => AWSmod.Client.prototype

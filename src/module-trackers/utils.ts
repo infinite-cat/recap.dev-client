@@ -59,12 +59,15 @@ tryRequire.lastError = () => lastError
 
 export const getModules = function getModules(id: string) {
   const modules: any[] = []
+  console.log('getModules', id)
+  console.log('getModules', typeof require.resolve.paths)
   if (typeof require.resolve.paths !== 'function') {
     const module = tryRequire(id)
 
     if (module) {
       modules.push(module)
     }
+    console.log('modules found for id ', id, modules)
     return modules
   }
 
