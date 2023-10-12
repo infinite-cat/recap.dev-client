@@ -292,7 +292,7 @@ export default {
    */
   init() {
     Hook(
-      ['@aws-sdk/smithy-client'],
+      ['@smithy/smithy-client'],
       (AWSmod) => {
         console.log('wrap using require-in-the-middle', Object.keys(AWSmod))
         return AWSSDKv3Wrapper(AWSmod.Client.prototype.send)
@@ -327,7 +327,7 @@ export default {
       (AWSmod) => AWSmod.SESClient.prototype
     );
     patchModule(
-      '@aws-sdk/smithy-client',
+      '@smithy/smithy-client',
       'send',
       AWSSDKv3Wrapper,
       (AWSmod) => {
