@@ -272,12 +272,7 @@ function AWSSDKv3Wrapper(wrappedFunction) {
           event.status = 'OK'
           event.request.requestId = response.requestId
 
-          if (response.data) {
-            event.response.statusCode = response.httpResponse.statusCode
-            event.status = 'OK'
-
-            specificEventCreators[serviceIdentifier].responseHandler(operation, response, event)
-          }
+          specificEventCreators[serviceIdentifier].responseHandler(operation, response, event)
 
           if (response.error !== null) {
             event.error = jsonStringify(response.error)
@@ -288,7 +283,6 @@ function AWSSDKv3Wrapper(wrappedFunction) {
         }
         return response;
       }).catch((error) => {
-        console.log('tracing error now', error)
         try {
           event.end = Date.now()
           event.error = serializeError(error)
