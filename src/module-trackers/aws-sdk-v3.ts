@@ -227,6 +227,7 @@ function getOperationByCommand(command) {
  * @returns {Function} The wrapped function
  */
 function AWSSDKv3Wrapper(wrappedFunction) {
+  console.log('wrapping function', wrappedFunction)
   return function internalAWSSDKv3Wrapper(command) {
     let responsePromise = wrappedFunction.apply(this, [command]);
     try {
@@ -295,7 +296,8 @@ export default {
       ['@smithy/smithy-client'],
       (AWSmod) => {
         console.log('wrap using require-in-the-middle', Object.keys(AWSmod))
-        return AWSSDKv3Wrapper(AWSmod.Client.prototype.send)
+        AWSmod.Client.prototype.send = AWSSDKv3Wrapper(AWSmod.Client.prototype.send)
+        return AWSmod
       },
     );
 
