@@ -273,11 +273,6 @@ function AWSSDKv3Wrapper(wrappedFunction) {
           event.request.requestId = response.requestId
 
           specificEventCreators[serviceIdentifier].responseHandler(operation, response, event)
-
-          if (response.error !== null) {
-            event.error = jsonStringify(response.error)
-            event.status = 'ERROR'
-          }
         } catch (e) {
           debugLog(e)
         }
