@@ -288,6 +288,7 @@ function AWSSDKv3Wrapper(wrappedFunction) {
         }
         return response;
       }).catch((error) => {
+        console.log('tracing error now', error)
         try {
           event.end = Date.now()
           event.error = serializeError(error)
