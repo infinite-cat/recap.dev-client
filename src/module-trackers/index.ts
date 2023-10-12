@@ -1,4 +1,5 @@
 import awsSdkTracker from './aws-sdk'
+import awsSdkV3Tracker from "./aws-sdk-v3"
 import { trackMysql } from './mysql'
 import { trackPostgres } from './postgres'
 import { trackElasticsearch } from './elasticsearch'
@@ -14,6 +15,7 @@ export const trackModules = () => {
     }
 
     awsSdkTracker.init()
+    awsSdkV3Tracker.init()
     trackMysql()
     trackPostgres()
     trackMongoDb()
