@@ -1,4 +1,3 @@
-import jsonStringify from 'json-stringify-safe'
 import Hook from 'require-in-the-middle'
 
 import { patchModule, serializeError } from './utils'
