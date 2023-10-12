@@ -232,6 +232,7 @@ function AWSSDKv3Wrapper(wrappedFunction) {
     console.log('wrapped command: ', command)
     let responsePromise = wrappedFunction.apply(this, [command]);
     try {
+      console.log(this, this.config, this.config.serviceId)
       const serviceIdentifier = this.config.serviceId.toLowerCase();
 
       if (!(serviceIdentifier in specificEventCreators)) {
