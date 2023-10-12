@@ -235,7 +235,7 @@ function AWSSDKv3Wrapper(wrappedFunction) {
       console.log(this, this.config, this.config.serviceId)
       const serviceIdentifier = this.config.serviceId.toLowerCase();
 
-      if (!(serviceIdentifier in specificEventCreators)) {
+      if (!serviceIdentifier) {
         // resource is not supported yet
         return responsePromise;
       }
