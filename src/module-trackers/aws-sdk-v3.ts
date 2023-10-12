@@ -247,6 +247,8 @@ function AWSSDKv3Wrapper(wrappedFunction) {
         },
       })
 
+      console.log('recording event', event)
+
       specificEventCreators[serviceIdentifier].requestHandler(
         operation,
         command,
