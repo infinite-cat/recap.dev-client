@@ -6,6 +6,7 @@ import { debugLog } from '../log'
 import { tracer } from '../tracer'
 import { ResourceAccessEvent } from '../entities'
 import { getSNSTrigger } from './sqs-sns-trigger.utils'
+import { safeParse } from '../utils'
 
 const SNSv3EventCreator = {
   requestHandler(operation, command, event: ResourceAccessEvent) {
@@ -197,6 +198,21 @@ const DynamoDBv3EventCreator = {
   },
 };
 
+const lambdaEventCreator = {
+  requestHandler(request, event) {
+    const parameters = request.params || {}
+
+    event.resourceIdentifier = {
+      functionName: parameters.FunctionName,
+    }
+    event.request.payload = parameters.Payload
+  },
+
+  responseHandler(response, event) {
+    event.response.payload = safeParse(new TextDecoder().decode(response?.data?.Payload)) || new TextDecoder().decode(response?.data?.Payload)
+  },
+}
+
 /**
  * a map between AWS resource names and their appropriate creator object.
  */
@@ -204,6 +220,7 @@ const specificEventCreators = {
   sns: SNSv3EventCreator,
   dynamodb: DynamoDBv3EventCreator,
   sqs: SQSv3EventCreator,
+  lambda: lambdaEventCreator,
 };
 
 /**
@@ -227,9 +244,7 @@ function getOperationByCommand(command) {
  * @returns {Function} The wrapped function
  */
 function AWSSDKv3Wrapper(wrappedFunction) {
-  console.log('wrapping function', wrappedFunction)
   return function internalAWSSDKv3Wrapper(command) {
-    console.log('wrapped command: ', command)
     let responsePromise = wrappedFunction.apply(this, [command]);
     try {
       console.log(this, this.config, this.config.serviceId)
@@ -246,8 +261,6 @@ function AWSSDKv3Wrapper(wrappedFunction) {
           operation,
         },
       })
-
-      console.log('recording event', event)
 
       specificEventCreators[serviceIdentifier].requestHandler(
         operation,
@@ -299,7 +312,6 @@ export default {
     Hook(
       ['@smithy/smithy-client'],
       (AWSmod) => {
-        console.log('wrap using require-in-the-middle', Object.keys(AWSmod))
         AWSmod.Client.prototype.send = AWSSDKv3Wrapper(AWSmod.Client.prototype.send)
         return AWSmod
       },
@@ -321,10 +333,7 @@ export default {
       '@aws-sdk/client-lambda',
       'send',
       AWSSDKv3Wrapper,
-      (AWSmod) => {
-        console.log('wrapping lambda client', Object.keys(AWSmod))
-        return AWSmod.LambdaClient.prototype
-      }
+      (AWSmod) => AWSmod.LambdaClient.prototype
     );
     patchModule(
       '@aws-sdk/client-ses',
@@ -336,10 +345,7 @@ export default {
       '@smithy/smithy-client',
       'send',
       AWSSDKv3Wrapper,
-      (AWSmod) => {
-        console.log('wrapping smithy client', Object.keys(AWSmod))
-        return AWSmod.Client.prototype
-      }
+      (AWSmod) => AWSmod.Client.prototype
     );
   },
 };
