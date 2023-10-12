@@ -208,7 +208,7 @@ const lambdaEventCreator = {
     event.request.payload = safeParse(new TextDecoder().decode(parameters.Payload)) || new TextDecoder().decode(parameters.Payload)
   },
 
-  responseHandler(response, event) {
+  responseHandler(operation, response, event) {
     event.response.payload = safeParse(new TextDecoder().decode(response?.Payload)) || new TextDecoder().decode(response?.Payload)
   },
 }
