@@ -1,4 +1,5 @@
 import jsonStringify from 'json-stringify-safe'
+import Hook from 'require-in-the-middle'
 
 import { patchModule, serializeError } from './utils'
 import { debugLog } from '../log'
@@ -290,6 +291,14 @@ export default {
    * Initializes the @aws-sdk tracer
    */
   init() {
+    Hook(
+      ['@aws-sdk/smithy-client'],
+      (AWSmod) => {
+        console.log('wrap using require-in-the-middle', Object.keys(AWSmod))
+        return AWSSDKv3Wrapper(AWSmod.Client.prototype.send)
+      },
+    );
+
     patchModule(
       '@aws-sdk/client-dynamodb',
       'send',
