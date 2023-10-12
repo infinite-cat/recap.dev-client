@@ -199,8 +199,8 @@ const DynamoDBv3EventCreator = {
 };
 
 const lambdaEventCreator = {
-  requestHandler(request, event) {
-    const parameters = request.params || {}
+  requestHandler(operation, command, event) {
+    const parameters = command.input || {}
 
     event.resourceIdentifier = {
       functionName: parameters.FunctionName,
@@ -276,7 +276,7 @@ function AWSSDKv3Wrapper(wrappedFunction) {
             event.response.statusCode = response.httpResponse.statusCode
             event.status = 'OK'
 
-            specificEventCreators[serviceIdentifier].responseHandler(response, event)
+            specificEventCreators[serviceIdentifier].responseHandler(operation, response, event)
           }
 
           if (response.error !== null) {
