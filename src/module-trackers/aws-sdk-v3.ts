@@ -303,6 +303,18 @@ export default {
       (AWSmod) => AWSmod.SQSClient.prototype
     );
     patchModule(
+      '@aws-sdk/client-lambda',
+      'send',
+      AWSSDKv3Wrapper,
+      (AWSmod) => AWSmod.LambdaClient.prototype
+    );
+    patchModule(
+      '@aws-sdk/client-ses',
+      'send',
+      AWSSDKv3Wrapper,
+      (AWSmod) => AWSmod.SESClient.prototype
+    );
+    patchModule(
       '@aws-sdk/smithy-client',
       'send',
       AWSSDKv3Wrapper,
