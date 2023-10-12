@@ -306,7 +306,10 @@ export default {
       '@aws-sdk/client-lambda',
       'send',
       AWSSDKv3Wrapper,
-      (AWSmod) => AWSmod.LambdaClient.prototype
+      (AWSmod) => {
+        console.log('wrapping lambda client', Object.keys(AWSmod))
+        return AWSmod.LambdaClient.prototype
+      }
     );
     patchModule(
       '@aws-sdk/client-ses',
@@ -318,7 +321,10 @@ export default {
       '@aws-sdk/smithy-client',
       'send',
       AWSSDKv3Wrapper,
-      (AWSmod) => AWSmod.Client.prototype
+      (AWSmod) => {
+        console.log('wrapping smithy client', Object.keys(AWSmod))
+        return AWSmod.Client.prototype
+      }
     );
   },
 };
