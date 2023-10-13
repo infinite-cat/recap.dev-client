@@ -1,7 +1,8 @@
 import shimmer from 'shimmer'
 import jsonStringify from 'json-stringify-safe'
-import { isObject } from 'lodash-es'
+import { isError, isObject } from 'lodash-es'
 import { tracer } from '../tracer'
+import { serializeError } from '../module-trackers/utils'
 
 /**
  * Captures following methods of the global console object with recap.dev tracing:
@@ -16,6 +17,10 @@ export const captureConsoleLogs = () => {
     tracer.addLogEntry(
       args
         .map((arg) => {
+          if (isError(arg)) {
+            return serializeError(arg)
+          }
+
           if (isObject(arg)) {
             return jsonStringify(arg)
           }
