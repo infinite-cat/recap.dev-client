@@ -98,9 +98,10 @@ const DynamoDBv3EventCreator = {
    * @param {proto.event_pb.Event} event The event to update the data on
    */
   requestHandler(operation, command, event) {
-    const resource = event.getResource();
     const parameters = command.input || {};
-    resource.setName(command.input.TableName || 'DynamoDBEngine');
+    event.resourceIdentifier = {
+      tableName: command.input.TableName || 'DynamoDBEngine',
+    }
 
     switch (operation) {
       case 'DeleteCommand':
