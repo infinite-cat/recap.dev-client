@@ -178,7 +178,7 @@ const DynamoDBv3EventCreator = {
     switch (operation) {
       case 'GetCommand':
       case 'GetItemCommand':
-        event.response.item = response.data.Item
+        event.response.item = response.Item
         break;
 
       case 'ListTablesCommand':
@@ -187,8 +187,8 @@ const DynamoDBv3EventCreator = {
 
       case 'ScanCommand':
       case 'QueryCommand': {
-        event.response.items = response.data.Items
-        event.response.lastEvaluatedKey = response.data.LastEvaluatedKey
+        event.response.items = response.Items
+        event.response.lastEvaluatedKey = response.LastEvaluatedKey
         break;
       }
 
