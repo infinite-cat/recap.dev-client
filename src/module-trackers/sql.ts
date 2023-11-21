@@ -4,15 +4,10 @@ import { debugLog } from '../log'
 import { serializeError } from './utils'
 import { tracer } from '../tracer'
 
-const mysqlParser = require('node-sql-parser/build/mysql')
-const postgresParser = require('node-sql-parser/build/postgresql')
-
 const MAX_QUERY_SIZE = 2048
 const MAX_PARAMS_LENGTH = 5
 
 const parsers = {
-  'MySQL': mysqlParser,
-  'PostgresQL': postgresParser,
 }
 
 export const parseQueryArgs = function parseQueryArgs(arg1, arg2) {
