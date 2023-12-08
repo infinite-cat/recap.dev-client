@@ -290,6 +290,8 @@ function AWSSDKv3Wrapper(wrappedFunction) {
         } catch (e) {
           debugLog(e)
         }
+
+        throw error
       });
     } catch (error) {
       debugLog(error)
