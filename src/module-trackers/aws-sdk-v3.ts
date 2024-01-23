@@ -266,18 +266,22 @@ function AWSSDKv3Wrapper(wrappedFunction) {
         },
       })
 
-      specificEventCreators[serviceIdentifier].requestHandler(
-        operation,
-        command,
-        event
-      );
+      try {
+        specificEventCreators[serviceIdentifier]?.requestHandler(
+          operation,
+          command,
+          event
+        );
+      } catch (e) {
+        debugLog(e)
+      }
       responsePromise = responsePromise.then((response) => {
         try {
           event.end = Date.now()
           event.status = 'OK'
           event.request.requestId = response.requestId
 
-          specificEventCreators[serviceIdentifier].responseHandler(operation, response, event)
+          specificEventCreators[serviceIdentifier]?.responseHandler(operation, response, event)
         } catch (e) {
           debugLog(e)
         }
