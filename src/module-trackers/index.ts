@@ -7,6 +7,8 @@ import { trackHttp2 } from './http/http2'
 import { trackMongoDb } from './mongodb'
 import { config } from '../config'
 
+export { mysqlQueryWrapper } from './mysql'
+
 export const trackModules = () => {
   try {
     if (config.disableResourceCapture) {
