@@ -1,7 +1,7 @@
 import { patchModule } from './utils'
 import { parseQueryArgs, wrapSqlQuery } from './sql'
 
-function mysqlQueryWrapper(wrappedFunction) {
+export function mysqlQueryWrapper(wrappedFunction) {
   const internalMySqlQueryWrapper = function internalMySqlQueryWrapper(sql, arg1, arg2) {
     let queryString
     let callback
