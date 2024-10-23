@@ -249,7 +249,10 @@ function getOperationByCommand(command) {
  * @returns {Function} The wrapped function
  */
 export function AWSSDKv3Wrapper(wrappedFunction) {
-  return function internalAWSSDKv3Wrapper(command) {
+  if (wrappedFunction.recapDevWrapped) {
+    return wrappedFunction
+  }
+  function internalAWSSDKv3Wrapper(command) {
     let responsePromise = wrappedFunction.apply(this, [command]);
     try {
       const serviceIdentifier = this.config.serviceId.toLowerCase();
@@ -301,7 +304,12 @@ export function AWSSDKv3Wrapper(wrappedFunction) {
       debugLog(error)
     }
     return responsePromise;
-  };
+  }
+
+  // @ts-ignore
+  internalAWSSDKv3Wrapper.recapDevWrapped = true
+
+  return internalAWSSDKv3Wrapper
 }
 
 export default {
