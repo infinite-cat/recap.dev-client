@@ -81,6 +81,9 @@ export const wrapSqlQuery = function wrapSqlQuery(queryString, params, callback,
       event.end = endTime
       event.status = err ? 'ERROR' : 'OK'
       event.response.rowCount = rowCount
+      if (isArray(res)) {
+        event.response.results = res.slice(0, 50)
+      }
       event.error = serializeError(err)
 
       if (callback) {

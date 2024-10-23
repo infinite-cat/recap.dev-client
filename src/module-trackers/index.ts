@@ -8,6 +8,7 @@ import { trackMongoDb } from './mongodb'
 import { config } from '../config'
 
 export { mysqlQueryWrapper } from './mysql'
+export { AWSSDKv3Wrapper } from './aws-sdk-v3'
 
 export const trackModules = () => {
   try {

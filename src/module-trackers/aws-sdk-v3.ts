@@ -248,7 +248,7 @@ function getOperationByCommand(command) {
  * @param {Function} wrappedFunction The function to wrap
  * @returns {Function} The wrapped function
  */
-function AWSSDKv3Wrapper(wrappedFunction) {
+export function AWSSDKv3Wrapper(wrappedFunction) {
   return function internalAWSSDKv3Wrapper(command) {
     let responsePromise = wrappedFunction.apply(this, [command]);
     try {
