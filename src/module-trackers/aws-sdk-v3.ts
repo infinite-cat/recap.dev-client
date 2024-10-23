@@ -341,11 +341,5 @@ export default {
       AWSSDKv3Wrapper,
       (AWSmod) => AWSmod.SESClient.prototype
     );
-    patchModule(
-      '@smithy/smithy-client',
-      'send',
-      AWSSDKv3Wrapper,
-      (AWSmod) => AWSmod.Client.prototype
-    );
   },
 };
