@@ -6,6 +6,10 @@
     "import/resolver": {"node": {"extensions": [".js", ".jsx", ".ts", ".tsx", ".json"]}},
     "import/core-modules": ["aws-sdk", "aws-lambda"]
   },
+  "globals": {
+    "fetch": "readonly",
+    "AbortController": "readonly",
+  },
   "rules": {
     "no-param-reassign": "off",
     "no-restricted-syntax": "off",

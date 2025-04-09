@@ -1,5 +1,4 @@
 import { gzipSync } from 'zlib'
-import fetch from 'node-fetch'
 import { TraceStore } from './services/trace-store'
 import { SimpleTraceStore } from './services/simple-trace-store'
 import { FunctionCallEvent, ResourceAccessEvent, Trace } from './entities'
@@ -179,6 +178,9 @@ export class Tracer {
         return
       }
 
+      const controller = new AbortController();
+      setTimeout(() => controller.abort(), config.syncTimeout);
+
       await fetch(config.syncEndpoint, {
         method: 'POST',
         body: dataBuffer,
@@ -186,7 +188,7 @@ export class Tracer {
           'Content-Type': 'application/json',
           'Content-Encoding': 'gzip',
         },
-        timeout: config.syncTimeout,
+        signal: controller.signal,
       })
 
       debugLog('recap.dev sync took: ', Date.now() - timestamp, ' ms')
