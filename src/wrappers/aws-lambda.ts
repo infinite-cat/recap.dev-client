@@ -49,7 +49,7 @@ export const wrapLambdaHandler = (func: any) => {
     let result
 
     try {
-      result = await func(request, context)
+      result = func(request, context)
     } catch (e) {
       tracer.functionEnd(event)
       tracer.setTraceError(e.toString())
