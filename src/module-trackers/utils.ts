@@ -99,5 +99,9 @@ export const serializeError = (err?: Error) => {
     return undefined
   }
 
+  if (!(err instanceof Error)) {
+    err = new Error(err)
+  }
+
   return jsonStringify(errorToObject(err))
 }

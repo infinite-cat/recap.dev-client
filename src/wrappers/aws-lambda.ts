@@ -52,7 +52,7 @@ export const wrapLambdaHandler = (func: any) => {
       result = func(request, context)
     } catch (e) {
       tracer.functionEnd(event)
-      tracer.setTraceError(e.toString())
+      tracer.setTraceError(e)
       clearTimeout(timeoutHandler)
       await tracer.sync()
       throw e
